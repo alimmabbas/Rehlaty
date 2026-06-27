@@ -77,6 +77,14 @@
   .cmp-row:last-child{border:none}.cmp-row small{font-size:11.5px;font-weight:700}
   .badgewrap{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
   .badge{background:linear-gradient(135deg,var(--gold),#d8cba6);color:#3a3420;font-size:11.5px;font-weight:800;padding:6px 11px;border-radius:20px}
+  .profile{display:flex;align-items:center;gap:12px}
+  .avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0}
+  .donutrow{display:flex;align-items:center;gap:14px;margin:4px 0}
+  .donleg{flex:1;min-width:0}
+  .legrow{display:flex;align-items:center;gap:7px;font-size:12.5px;padding:3px 0}
+  .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+  .lname{flex:1;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lval{color:var(--muted);font-weight:700;font-size:11.5px;flex-shrink:0}
   .histday{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
   .hd-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer}
   .hd-date{font-weight:800;font-size:13px;color:var(--navy);min-width:48px}
@@ -534,9 +542,13 @@
         </div>
         <div class="lbl" style="margin-top:11px">كامل ولا فوربلاي</div>
         <div class="seg" style="margin-bottom:2px"><button class="on" id="sxTypeFull" onclick="sxType('full')">كامل</button><button id="sxTypeFore" onclick="sxType('foreplay')">فوربلاي بس</button></div>
-        <div class="lbl" style="margin-top:10px">نوع النشاط (للطرفين)</div>
+        <div class="lbl" style="margin-top:10px">نوع النشاط (للطرفين) — اكتبه بطريقتك</div>
         <div class="sym-wrap" id="sxActChips"></div>
-        <div style="margin:6px 0"><span class="small" onclick="tgEdit('sxActEdit','acts',rActs)" style="color:var(--teal);cursor:pointer;font-weight:700">تعديل القائمة ✎ (ضيف أنواعك)</span></div>
+        <div style="display:flex;gap:8px;margin-top:7px">
+          <input id="newAct" style="flex:1" placeholder="اكتب نوع وأضفه">
+          <button class="btn ghost sm" onclick="addActInline()">+ إضافة</button>
+        </div>
+        <div style="margin:6px 0"><span class="small" onclick="tgEdit('sxActEdit','acts',rActs)" style="color:var(--teal);cursor:pointer;font-weight:700">تعديل القائمة ✎</span></div>
         <div id="sxActEdit" style="display:none;margin-bottom:6px"></div>
         <div class="lbl" style="margin-top:6px">الوضع <span class="small" style="font-weight:600">(تضيفهم بصورهم من «مكتبة الأوضاع» تحت)</span></div>
         <div class="sym-wrap" id="sxPosChips"></div>
@@ -544,6 +556,19 @@
         <div style="display:flex;gap:9px">
           <div class="pill" id="sxOrgYou" style="flex:1;text-align:center" onclick="sxTog('you')">ليك</div>
           <div class="pill" id="sxOrgPartner" style="flex:1;text-align:center" onclick="sxTog('partner')">للطرف التاني</div>
+        </div>
+        <div class="lbl" style="margin-top:11px">القذف / الإنزال</div>
+        <div style="display:flex;gap:9px">
+          <div class="pill" id="sxEjYou" style="flex:1;text-align:center" onclick="sxEj('you')">نزل ليك</div>
+          <div class="pill" id="sxEjPartner" style="flex:1;text-align:center" onclick="sxEj('partner')">نزل للطرف</div>
+        </div>
+        <div id="sxEjWhereWrap" style="display:none;margin-top:9px">
+          <div class="lbl">نزل فين (ليك)</div>
+          <div class="sym-wrap" id="sxEjWhereChips"></div>
+          <div style="display:flex;gap:8px;margin-top:7px">
+            <input id="sxEjOther" style="flex:1" placeholder="أو اكتب مكان تاني">
+            <button class="btn ghost sm" onclick="sxEjOtherAdd()">تحديد</button>
+          </div>
         </div>
         <div class="field" style="margin-top:11px"><label>إيه المميز فيه</label><input id="sxSpecial" placeholder="..."></div>
         <div class="field" style="margin-top:9px"><label>إزاي حصل</label><textarea id="sxHow" rows="2" placeholder="..."></textarea></div>
@@ -568,13 +593,19 @@
           <div class="stat"><b id="sxFullPct">—</b><span>نسبة الكامل</span></div>
           <div class="stat"><b id="sxOrgYouPct">—</b><span>أورجازم ليك</span></div>
           <div class="stat"><b id="sxOrgPartPct">—</b><span>أورجازم للطرف</span></div>
+          <div class="stat"><b id="sxEjYouPct">—</b><span>نزل ليك</span></div>
+          <div class="stat"><b id="sxEjPartPct">—</b><span>نزل للطرف</span></div>
         </div>
-        <div class="lbl" style="margin-top:12px">حسب الشريك</div>
-        <div id="sxByPartner" class="hist"></div>
-        <div class="lbl" style="margin-top:12px">أكثر الأنواع</div>
-        <div id="sxByAct" class="hist"></div>
-        <div class="lbl" style="margin-top:12px">أكثر الأوضاع</div>
-        <div id="sxByPos" class="hist"></div>
+        <div class="lbl" style="margin-top:14px">كامل / فوربلاي</div>
+        <div class="donutrow"><svg id="pieType" width="120" height="120" viewBox="0 0 160 160"></svg><div class="donleg" id="pieType_leg"></div></div>
+        <div class="lbl" style="margin-top:8px">القذف نزل فين (ليك)</div>
+        <div class="donutrow"><svg id="pieEj" width="120" height="120" viewBox="0 0 160 160"></svg><div class="donleg" id="pieEj_leg"></div></div>
+        <div class="lbl" style="margin-top:8px">حسب الشريك</div>
+        <div class="donutrow"><svg id="piePartner" width="120" height="120" viewBox="0 0 160 160"></svg><div class="donleg" id="piePartner_leg"></div></div>
+        <div class="lbl" style="margin-top:8px">أكثر الأنواع</div>
+        <div class="donutrow"><svg id="pieActs" width="120" height="120" viewBox="0 0 160 160"></svg><div class="donleg" id="pieActs_leg"></div></div>
+        <div class="lbl" style="margin-top:8px">أكثر الأوضاع</div>
+        <div class="donutrow"><svg id="piePos" width="120" height="120" viewBox="0 0 160 160"></svg><div class="donleg" id="piePos_leg"></div></div>
       </div>
       <div class="card">
         <div class="ch"><h3>🗒️ السجل</h3></div>
@@ -695,13 +726,22 @@
         <div class="note">التذكيرات بتشتغل والتطبيق مفتوح. لو ضفته للـHome Screen وسمحت بالإشعارات، بتظهرلك كإشعار نظام. على الآيفون الإشعارات في الخلفية محدودة، فخلّي التطبيق مفتوح وقت ما تستنى تذكير مهم.</div>
       </div>
       <div class="card">
-        <div class="ch"><h3>☁️ الحساب والمزامنة</h3><span class="meta" id="syncStatus"></span></div>
-        <div class="small" id="acctEmail" style="margin-bottom:11px">—</div>
-        <div class="big-toggle" id="bioToggle" onclick="toggleBio()" style="margin-bottom:11px">
-          <div><div style="font-weight:800;font-size:13.5px">🔒 قفل بالوجه / البصمة (Face ID)</div><div style="font-size:11.5px;color:var(--muted)">يفتح بوجهك بدل ما تكتب الباسوورد</div></div>
+        <div class="ch"><h3>👤 الملف الشخصي</h3><span class="meta" id="syncStatus"></span></div>
+        <div class="profile">
+          <div class="avatar" id="profAvatar">؟</div>
+          <div style="flex:1;min-width:0"><div id="profName" style="font-weight:800;font-size:15px">—</div><div class="small" id="acctEmail" style="word-break:break-all">—</div></div>
+        </div>
+        <div class="sgrid" style="margin-top:12px">
+          <div class="stat"><b id="profW">—</b><span>الوزن الحالي</span></div>
+          <div class="stat"><b id="profGoal">—</b><span>الهدف</span></div>
+          <div class="stat"><b id="profBMI">—</b><span>BMI</span></div>
+          <div class="stat"><b id="profSince">—</b><span>عضو منذ</span></div>
+        </div>
+        <div class="big-toggle" id="bioToggle" onclick="toggleBio()" style="margin-top:12px">
+          <div><div style="font-weight:800;font-size:13.5px">🔒 قفل بالوجه / البصمة (Face ID)</div><div style="font-size:11.5px;color:var(--muted)">يفتح بوجهك بدل الباسوورد</div></div>
           <div class="switch"></div>
         </div>
-        <button class="btn ghost" onclick="doSignOut()">تسجيل خروج</button>
+        <button class="btn ghost" onclick="doSignOut()" style="margin-top:4px">🚪 تسجيل خروج (لوج آوت)</button>
       </div>
       <div class="card">
         <div class="ch"><h3>📄 تقرير للدكتور</h3></div>
@@ -759,13 +799,7 @@
   </div>
 </div>
 <div id="lockOverlay">
-  <div class="authbox" style="text-align:center">
-    <div class="authlogo">رحلتي</div>
-    <div style="font-size:46px;margin:10px 0">🔒</div>
-    <div class="authsub">افتح بالوجه أو البصمة</div>
-    <button class="btn" onclick="tryUnlock()">فتح 🔓</button>
-    <div class="authnote"><span onclick="lockFallback()" style="color:var(--teal);cursor:pointer;font-weight:700">دخول بالباسوورد بدل كده</span></div>
-  </div>
+  <div class="authbox" style="text-align:center" id="lockBox"></div>
 </div>
 
 <script>
@@ -794,7 +828,7 @@ const DEFAULT={
   ],
   sexLog:[],
   partners:["أميرة","مريم"],
-  acts:["مهبلي","فموي","يدوي","مداعبة","تدليك","شرجي"],
+  acts:[],
   positions:[],
   labs:[],
   avoidFoods:["المقليات والدهون المشبعة","العصائر المحلاة والمشروبات الغازية","الأكل الحرّيف جداً والشطة","الكافيين الزائد (قهوة/مشروبات طاقة)","الأطعمة المصنّعة واللانشون","الحلويات والسكريات المكررة","الوجبات الدسمة قبل النوم","البصل والثوم النيء (للقولون)","الإفراط في البقوليات دفعة واحدة (انتفاخ)","منتجات الألبان كاملة الدسم"]
@@ -805,7 +839,7 @@ const SUPA_URL="https://vkluqgeywxxcamtbsuwg.supabase.co";
 const SUPA_KEY="sb_publishable_SijlskhjR9LYw4aCudAH8g_9gLfTP0H";
 let supa=null, cloudTimer=null;
 function initSupabase(){ try{ if(window.supabase&&window.supabase.createClient){ supa=window.supabase.createClient(SUPA_URL,SUPA_KEY); } }catch(e){ supa=null; } }
-function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)||!DB.acts.length) DB.acts=["مهبلي","فموي","يدوي","مداعبة","تدليك","شرجي"]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); }
+function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); }
 function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(KEY); DB=r?JSON.parse(r):structuredClone(DEFAULT); }catch(e){ DB=structuredClone(DEFAULT); } ensureShape(); }
 function dbSave(){ saveLocal(); scheduleCloudSync(); }
@@ -814,7 +848,15 @@ async function curUser(){ if(!supa)return null; try{ const {data}=await supa.aut
 async function saveToCloud(){ if(!supa)return; const u=await curUser(); if(!u)return; try{ await supa.from('app_data').upsert({user_id:u.id,data:DB,updated_at:new Date().toISOString()}); setSync('متزامن مع السحابة ✓'); }catch(e){ setSync('هيتزامن أول ما النت يرجع'); } }
 async function loadFromCloud(){ if(!supa)return; const u=await curUser(); if(!u)return; try{ const r=await supa.from('app_data').select('data').eq('user_id',u.id).maybeSingle(); if(!r.error&&r.data&&r.data.data&&Object.keys(r.data.data).length){ DB=r.data.data; ensureShape(); saveLocal(); } else { ensureShape(); await saveToCloud(); } }catch(e){} }
 function setSync(t){ const e=document.getElementById('syncStatus'); if(e)e.textContent=t; }
-async function renderAccount(){ const u=await curUser(); const e=document.getElementById('acctEmail'); if(e)e.textContent=u?('مسجّل دخول: '+u.email):'مش مسجّل دخول (محلي فقط)'; }
+async function renderAccount(){
+  const u=await curUser(); const e=document.getElementById('acctEmail'); if(e)e.textContent=u?u.email:'مش مسجّل دخول (محلي فقط)';
+  const s=S(),nm=(s.name||'').trim()||'المستخدم';
+  set('profName',nm);const av=document.getElementById('profAvatar');if(av)av.textContent=(nm[0]||'؟');
+  const cw=curWeight()||s.startW;set('profW',cw+' كجم');set('profGoal',s.goalW+' كجم');
+  const h=(s.heightCm||174)/100,bmi=h?cw/(h*h):0;set('profBMI',bmi?bmi.toFixed(1):'—');
+  set('profSince',s.startDate?fmtDate(s.startDate):'—');
+  renderBio();
+}
 /* AUTH */
 function authMsg(t){ const e=document.getElementById('authMsg'); if(e)e.textContent=t; }
 function showAuth(){ document.getElementById('authOverlay').classList.add('show'); }
@@ -838,7 +880,7 @@ async function doSignIn(){
   if(error){authMsg('بيانات غلط أو الحساب مش متأكّد');return;}
   await afterLogin();
 }
-async function afterLogin(){ await loadFromCloud(); hideAuth(); renderAll(); renderAccount(); toast('أهلاً بيك 👋'); }
+async function afterLogin(){ await loadFromCloud(); hideAuth(); renderAll(); renderAccount(); toast('أهلاً بيك 👋'); if(bioSupported()&&!bioEnabled()) showBioSetup(); }
 async function doSignOut(){ if(supa)await supa.auth.signOut(); renderAccount(); showAuth(); }
 /* BIOMETRIC LOCK (Face ID / fingerprint via WebAuthn) */
 function bioSupported(){ return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create); }
@@ -877,10 +919,20 @@ async function toggleBio(){
   if(bioEnabled()){ localStorage.removeItem('bioOn'); localStorage.removeItem('bioId'); renderBio(); toast('اتقفل القفل بالوجه'); }
   else { const ok=await bioRegister(); renderBio(); toast(ok?'اتفعّل ✓ هيطلب وجهك أول ما تفتح':'اتلغى التفعيل'); }
 }
-function showLock(){ document.getElementById('lockOverlay').classList.add('show'); }
-function hideLock(){ document.getElementById('lockOverlay').classList.remove('show'); }
-async function tryUnlock(){ const ok=await bioUnlock(); if(ok)hideLock(); else toast('متعرفش — جرّب تاني'); }
-function lockFallback(){ hideLock(); doSignOut(); }
+function showLock(){renderLock("unlock");document.getElementById("lockOverlay").classList.add("show");}
+function showBioSetup(){renderLock("setup");document.getElementById("lockOverlay").classList.add("show");}
+function hideLock(){document.getElementById("lockOverlay").classList.remove("show");}
+function renderLock(mode){const box=document.getElementById("lockBox");if(!box)return;
+  if(mode==="setup"){box.innerHTML=`<div class="authlogo">رحلتي</div><div style="font-size:46px;margin:10px 0">🔐</div><div class="authsub">تحب تفعّل الدخول بالوجه؟ المرة الجاية هيفتح بوجهك بدل الباسوورد.</div><button class="btn" id="lockBtn">فعّل الدخول بالوجه</button><div class="authnote"><span id="lockSkip" style="color:var(--teal);cursor:pointer;font-weight:700">مش دلوقتي</span></div>`;
+    box.querySelector("#lockBtn").onclick=async()=>{const ok=await bioRegister();renderAccount();if(ok){hideLock();toast("اتفعّل ✓");}else toast("اتلغى التفعيل");};
+    box.querySelector("#lockSkip").onclick=()=>hideLock();
+  }else{box.innerHTML=`<div class="authlogo">رحلتي</div><div style="font-size:46px;margin:10px 0">🔒</div><div class="authsub">افتح بالوجه أو البصمة</div><button class="btn" id="lockBtn">فتح 🔓</button><div class="authnote"><span id="lockFb" style="color:var(--teal);cursor:pointer;font-weight:700">دخول بالباسوورد بدل كده</span></div>`;
+    box.querySelector("#lockBtn").onclick=tryUnlock;
+    box.querySelector("#lockFb").onclick=lockFallback;
+  }
+}
+async function tryUnlock(){const ok=await bioUnlock();if(ok)hideLock();else toast("متعرفش — جرّب تاني");}
+function lockFallback(){hideLock();doSignOut();}
 function dowOf(k){const a=k.split("-").map(Number);return new Date(a[0],a[1]-1,a[2]).getDay();}
 function weekIndexOf(k){const a=k.split("-").map(Number);const s=(typeof DB!=="undefined"&&DB.settings&&DB.settings.startDate)?DB.settings.startDate:k;const sa=s.split("-").map(Number);const d=new Date(a[0],a[1]-1,a[2]);const sd=new Date(sa[0],sa[1]-1,sa[2]);return Math.floor((d-sd)/(7*864e5));}
 function planRotation(k){if(typeof PLANS==="undefined")return null;const n=PLANS.length;let i=weekIndexOf(k);i=((i%n)+n)%n;return PLANS[i];}
@@ -979,7 +1031,7 @@ const COMMON_CAL=[
  ["تمر (٢)",40,"fruit"],["سلطة فواكه كوب",90,"fruit"],
  // أكل
  ["بيضة مسلوقة",78,"food"],["رغيف عيش بلدي",90,"food"],["صدر فراخ مشوي",165,"food"],["نص كوباية رز",100,"food"],
- ["زبادي قليل دسم",60,"food"],["ملعقة زيت زيتون",120,"food"],["تونة في ماء",100,"food"],["جبنة قريش ١٠٠جم",98,"food"],
+ ["زبادي قليل دسم",60,"food"],["لبن كوب",110,"food"],["لبن خالي الدسم كوب",85,"food"],["ملعقة زيت زيتون",120,"food"],["تونة في ماء",100,"food"],["جبنة قريش ١٠٠جم",98,"food"],
  ["بطاطا مسلوقة",130,"food"],["حفنة لوز",160,"food"],["فول طبق",180,"food"],["سلطة خضرا",45,"food"],
  ["سمك مشوي قطعة",150,"food"],["كفتة فراخ",200,"food"],["لحمة هبر مشوية",180,"food"],["شوفان نص كوب",150,"food"],
  ["شوربة عدس كوب",180,"food"],["فريك نص كوباية",110,"food"],["جبنة بيضا لايت",50,"food"]
@@ -1612,13 +1664,18 @@ function renderDash(){
 function streakCount(){let n=0,d=new Date();for(;;){const day=DB.days[isoOf(d)];const act=day&&(day.water>0||(Array.isArray(day.meals)&&day.meals.some(m=>m&&m.done))||(day.exercise&&day.exercise.length)||prayerDone(day.prayers));if(act){n++;d.setDate(d.getDate()-1);}else break;if(n>3650)break;}return n;}
 
 /* PRIVATE — SEXUAL LIFE */
-let sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[]};
+let sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[],ejYou:false,ejPartner:false,ejWhere:""};
+const EJWHERE=["جوّه","بره","فموي"];
+function sxEj(w){if(w==="you"){sxDraft.ejYou=!sxDraft.ejYou;if(!sxDraft.ejYou)sxDraft.ejWhere="";}else sxDraft.ejPartner=!sxDraft.ejPartner;renderEj();}
+function renderEj(){const y=document.getElementById("sxEjYou"),p=document.getElementById("sxEjPartner");if(y)y.classList.toggle("on",sxDraft.ejYou);if(p)p.classList.toggle("on",sxDraft.ejPartner);const wrap=document.getElementById("sxEjWhereWrap");if(wrap)wrap.style.display=sxDraft.ejYou?"block":"none";const c=document.getElementById("sxEjWhereChips");if(c){c.innerHTML="";EJWHERE.concat(sxDraft.ejWhere&&!EJWHERE.includes(sxDraft.ejWhere)?[sxDraft.ejWhere]:[]).forEach(o=>{const on=sxDraft.ejWhere===o;const el=document.createElement("div");el.className="favsel"+(on?" on":"");el.textContent=o;el.onclick=()=>{sxDraft.ejWhere=on?"":o;renderEj();};c.appendChild(el);});}}
+function sxEjOtherAdd(){const v=(gv("sxEjOther")||"").trim();if(!v)return;sxDraft.ejWhere=v;val("sxEjOther","");renderEj();}
 let sxFilter="all";
 function sxType(t){sxDraft.type=t;const f=document.getElementById("sxTypeFull"),o=document.getElementById("sxTypeFore");if(f)f.classList.toggle("on",t==="full");if(o)o.classList.toggle("on",t==="foreplay");}
 function sxTog(w){if(w==="you"){sxDraft.orgYou=!sxDraft.orgYou;document.getElementById("sxOrgYou").classList.toggle("on",sxDraft.orgYou);}else{sxDraft.orgPartner=!sxDraft.orgPartner;document.getElementById("sxOrgPartner").classList.toggle("on",sxDraft.orgPartner);}}
 function renderPartnerChips(){const w=document.getElementById("sxPartnerChips");if(!w)return;w.innerHTML="";(DB.partners||[]).forEach(name=>{const on=sxDraft.partner===name;const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.textContent=name;c.onclick=()=>{sxDraft.partner=on?"":name;renderPartnerChips();};w.appendChild(c);});}
 function togglePartnerEdit(){tgEdit("sxPartnerEdit","partners",renderPartnerChips);}
-function rActs(){const w=document.getElementById("sxActChips");if(!w)return;w.innerHTML="";(DB.acts||[]).forEach(a=>{const on=sxDraft.acts.includes(a);const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.textContent=a;c.onclick=()=>{if(on)sxDraft.acts=sxDraft.acts.filter(x=>x!==a);else sxDraft.acts.push(a);rActs();};w.appendChild(c);});}
+function rActs(){const w=document.getElementById("sxActChips");if(!w)return;w.innerHTML="";const arr=DB.acts||[];if(!arr.length){w.innerHTML='<div class="small">اكتب نوعك في الخانة تحت وأضفه</div>';return;}arr.forEach(a=>{const on=sxDraft.acts.includes(a);const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.textContent=a;c.onclick=()=>{if(on)sxDraft.acts=sxDraft.acts.filter(x=>x!==a);else sxDraft.acts.push(a);rActs();};w.appendChild(c);});}
+function addActInline(){const v=(gv("newAct")||"").trim();if(!v)return;if(!DB.acts)DB.acts=[];if(!DB.acts.includes(v))DB.acts.push(v);if(!sxDraft.acts.includes(v))sxDraft.acts.push(v);dbSave();val("newAct","");rActs();}
 function rPos(){const w=document.getElementById("sxPosChips");if(!w)return;w.innerHTML="";const arr=DB.positions||[];if(!arr.length){w.innerHTML='<div class="small">ضيف أوضاعك من «مكتبة الأوضاع» تحت</div>';return;}arr.forEach(p=>{const on=sxDraft.positions.includes(p.name);const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.innerHTML=(p.imgs&&p.imgs[0]?`<img src="${p.imgs[0]}" style="width:22px;height:22px;border-radius:5px;object-fit:cover;vertical-align:middle;margin-left:5px">`:"")+esc(p.name);c.onclick=()=>{if(on)sxDraft.positions=sxDraft.positions.filter(x=>x!==p.name);else sxDraft.positions.push(p.name);rPos();};w.appendChild(c);});}
 /* POSITIONS LIBRARY */
 function compressImg(file,maxDim,q){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;const s=Math.min(1,maxDim/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);const cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h);res(cv.toDataURL("image/jpeg",q));};img.onerror=rej;img.src=fr.result;};fr.onerror=rej;fr.readAsDataURL(file);});}
@@ -1664,19 +1721,36 @@ function listManage(eid,arr,refresh){const e=document.getElementById(eid);if(!e)
   add.appendChild(ai);add.appendChild(ab);e.appendChild(add);}
 function renderSxFilter(){const w=document.getElementById("sxFilterChips");if(!w)return;w.innerHTML="";["all"].concat(DB.partners||[]).forEach(p=>{const on=sxFilter===p;const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.textContent=p==="all"?"الكل":p;c.onclick=()=>{sxFilter=p;renderSex();};w.appendChild(c);});}
 function addSex(){
-  const e={id:"s"+Date.now(),date:isoToday(),partner:sxDraft.partner||"",place:gv("sxPlace").trim(),time:gv("sxTime"),duration:+gv("sxDur")||0,type:sxDraft.type,acts:[...sxDraft.acts],positions:[...sxDraft.positions],orgYou:sxDraft.orgYou,orgPartner:sxDraft.orgPartner,special:gv("sxSpecial").trim(),how:gv("sxHow").trim()};
+  const e={id:"s"+Date.now(),date:isoToday(),partner:sxDraft.partner||"",place:gv("sxPlace").trim(),time:gv("sxTime"),duration:+gv("sxDur")||0,type:sxDraft.type,acts:[...sxDraft.acts],positions:[...sxDraft.positions],orgYou:sxDraft.orgYou,orgPartner:sxDraft.orgPartner,ejYou:sxDraft.ejYou,ejPartner:sxDraft.ejPartner,ejWhere:sxDraft.ejWhere||"",special:gv("sxSpecial").trim(),how:gv("sxHow").trim()};
   if(!DB.sexLog)DB.sexLog=[];DB.sexLog.push(e);dbSave();
   ["sxPlace","sxTime","sxDur","sxSpecial","sxHow"].forEach(id=>val(id,""));
-  sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[]};sxType("full");
+  sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[],ejYou:false,ejPartner:false,ejWhere:""};sxType("full");
   document.getElementById("sxOrgYou").classList.remove("on");document.getElementById("sxOrgPartner").classList.remove("on");
-  renderPartnerChips();rActs();rPos();renderSex();toast("اتسجّل ✓");
+  renderPartnerChips();rActs();rPos();renderEj();renderSex();toast("اتسجّل ✓");
 }
 function rmSex(id){DB.sexLog=(DB.sexLog||[]).filter(x=>x.id!==id);dbSave();renderSex();}
 function stripT(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function esc(s){return String(s||"").replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));}
 function countList(arr,getter){const m={};arr.forEach(e=>getter(e).forEach(a=>m[a]=(m[a]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+const PIE=["#00B5A5","#BEB28F","#7a5cc0","#d8645c","#3aa0e0","#e0a93a","#5cb85c","#c0556f","#9aa0ad","#2bb0a3"];
+function donut(svgId,segs,center){
+  const svg=document.getElementById(svgId);if(!svg)return;svg.innerHTML="";const NS="http://www.w3.org/2000/svg",cx=80,cy=80,r=58,rin=37;
+  const total=segs.reduce((a,s)=>a+s.value,0);
+  if(!total){const c=document.createElementNS(NS,"circle");c.setAttribute("cx",cx);c.setAttribute("cy",cy);c.setAttribute("r",r);c.setAttribute("fill","none");c.setAttribute("stroke","#eee");c.setAttribute("stroke-width",r-rin);svg.appendChild(c);const t=document.createElementNS(NS,"text");t.setAttribute("x",cx);t.setAttribute("y",cy+4);t.setAttribute("text-anchor","middle");t.setAttribute("fill","#b9bdc7");t.setAttribute("font-size","11");t.textContent="لا يوجد";svg.appendChild(t);return;}
+  let ang=-Math.PI/2;
+  segs.forEach(s=>{if(!s.value)return;const a2=ang+(s.value/total)*2*Math.PI;const large=(a2-ang)>Math.PI?1:0;
+    const x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    const xi2=cx+rin*Math.cos(a2),yi2=cy+rin*Math.sin(a2),xi1=cx+rin*Math.cos(ang),yi1=cy+rin*Math.sin(ang);
+    const p=document.createElementNS(NS,"path");p.setAttribute("d",`M${x1} ${y1} A${r} ${r} 0 ${large} 1 ${x2} ${y2} L${xi2} ${yi2} A${rin} ${rin} 0 ${large} 0 ${xi1} ${yi1} Z`);p.setAttribute("fill",s.color);svg.appendChild(p);ang=a2;});
+  if(center!=null){const t=document.createElementNS(NS,"text");t.setAttribute("x",cx);t.setAttribute("y",cy+6);t.setAttribute("text-anchor","middle");t.setAttribute("fill","#000034");t.setAttribute("font-size","19");t.setAttribute("font-weight","800");t.textContent=center;svg.appendChild(t);}
+}
+function pieBlock(svgId,legId,entries,center){
+  const segs=entries.map(([label,value],i)=>({label,value,color:PIE[i%PIE.length]}));
+  donut(svgId,segs,center);
+  const leg=document.getElementById(legId);if(leg){const tot=segs.reduce((a,s)=>a+s.value,0);leg.innerHTML=segs.length?segs.map(s=>`<div class="legrow"><span class="dot" style="background:${s.color}"></span><span class="lname">${esc(s.label)}</span><span class="lval">${s.value}${tot?(" · "+Math.round(s.value/tot*100)+"٪"):""}</span></div>`).join(""):'<div class="small">لا يوجد</div>';}
+}
 function renderSex(){
-  renderPartnerChips();rActs();rPos();renderSxFilter();renderPosLib();
+  renderPartnerChips();rActs();rPos();renderSxFilter();renderPosLib();renderEj();
   const all=DB.sexLog||[];
   const log=sxFilter==="all"?all:all.filter(e=>e.partner===sxFilter);
   set("sxCount",all.length+" تسجيل"+(sxFilter!=="all"?(" · "+log.length+" مع "+esc(sxFilter)):""));
@@ -1686,12 +1760,18 @@ function renderSex(){
   miniBar("sxFreqChart",weeks,labels,"#d8645c");
   const durs=log.map(e=>e.duration).filter(x=>x>0);
   set("sxAvgDur",durs.length?Math.round(durs.reduce((a,b)=>a+b,0)/durs.length):"—");
-  set("sxFullPct",log.length?Math.round(log.filter(e=>e.type==="full").length/log.length*100)+"٪":"—");
-  set("sxOrgYouPct",log.length?Math.round(log.filter(e=>e.orgYou).length/log.length*100)+"٪":"—");
-  set("sxOrgPartPct",log.length?Math.round(log.filter(e=>e.orgPartner).length/log.length*100)+"٪":"—");
-  const byP=document.getElementById("sxByPartner");if(byP)byP.innerHTML=countList(all,e=>[e.partner||"غير محدد"]).map(([k,v])=>`<div class="hist-row"><span>${esc(k)}</span><span><b>${v}</b> مرة</span></div>`).join("")||'<div class="small">لا يوجد</div>';
-  const byA=document.getElementById("sxByAct");if(byA)byA.innerHTML=countList(log,e=>e.acts||[]).map(([k,v])=>`<div class="hist-row"><span>${esc(k)}</span><span><b>${v}</b> مرة</span></div>`).join("")||'<div class="small">لا يوجد</div>';
-  const byPos=document.getElementById("sxByPos");if(byPos)byPos.innerHTML=countList(log,e=>e.positions||[]).map(([k,v])=>`<div class="hist-row"><span>${esc(k)}</span><span><b>${v}</b> مرة</span></div>`).join("")||'<div class="small">لا يوجد</div>';
+  const pct=(n)=>log.length?Math.round(n/log.length*100)+"٪":"—";
+  const full=log.filter(e=>e.type==="full").length;
+  set("sxFullPct",pct(full));
+  set("sxOrgYouPct",pct(log.filter(e=>e.orgYou).length));
+  set("sxOrgPartPct",pct(log.filter(e=>e.orgPartner).length));
+  set("sxEjYouPct",pct(log.filter(e=>e.ejYou).length));
+  set("sxEjPartPct",pct(log.filter(e=>e.ejPartner).length));
+  pieBlock("pieType","pieType_leg",[["كامل",full],["فوربلاي",log.length-full]],log.length||"");
+  pieBlock("pieEj","pieEj_leg",countList(log.filter(e=>e.ejYou&&e.ejWhere),e=>[e.ejWhere]));
+  pieBlock("piePartner","piePartner_leg",countList(log,e=>[e.partner||"غير محدد"]));
+  pieBlock("pieActs","pieActs_leg",countList(log,e=>e.acts||[]));
+  pieBlock("piePos","piePos_leg",countList(log,e=>e.positions||[]));
   const list=document.getElementById("sxList");if(list){list.innerHTML="";
     [...log].reverse().forEach(e=>{const item=document.createElement("div");item.className="histday";
       item.innerHTML=`<div class="hd-head"><span class="hd-date">${fmtDate(e.date)}</span><span class="hd-chips">${e.partner?("👤"+esc(e.partner)+" "):""}${e.duration?("⏱️"+e.duration+"د "):""}${e.type==="full"?"كامل":"فوربلاي"}</span><span class="hd-ar">▾</span></div><div class="hd-body"></div>`;
@@ -1710,6 +1790,7 @@ function sexDetail(e){
   if(e.acts&&e.acts.length)h+=`<div class="dd"><b>نوع النشاط:</b> ${e.acts.map(esc).join("، ")}</div>`;
   if(e.positions&&e.positions.length)h+=`<div class="dd"><b>الوضع:</b> ${e.positions.map(esc).join("، ")}</div>`;
   h+=`<div class="dd"><b>الأورجازم:</b> ${e.orgYou?"ليك ✓":"ليك ✗"} · ${e.orgPartner?"للطرف ✓":"للطرف ✗"}</div>`;
+  if(e.ejYou||e.ejPartner||e.ejWhere)h+=`<div class="dd"><b>القذف:</b> ${e.ejYou?("ليك ✓"+(e.ejWhere?(" ("+esc(e.ejWhere)+")"):"")):"ليك ✗"} · ${e.ejPartner?"للطرف ✓":"للطرف ✗"}</div>`;
   if(e.special)h+=`<div class="dd"><b>المميز:</b> ${esc(e.special)}</div>`;
   if(e.how)h+=`<div class="dd"><b>إزاي حصل:</b> ${esc(e.how)}</div>`;
   h+=`<div class="dd"><span onclick="rmSex('${e.id}')" style="color:var(--bad);font-weight:800;cursor:pointer">حذف التسجيل</span></div>`;
@@ -1807,6 +1888,8 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.cla
     else { showAuth(); }
   } else { hideAuth(); }
   renderAll();
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&bioEnabled())showLock();});
+  window.addEventListener("pagehide",()=>{if(bioEnabled())showLock();});
   checkReminders(); setInterval(checkReminders,30000);
 })();
 </script>
