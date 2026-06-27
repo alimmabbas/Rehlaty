@@ -348,7 +348,7 @@
         <div class="calbar"><div class="calbar-fill" id="calFill"></div></div>
         <div class="calnums"><span id="calLeft">فاضل 1500</span><span id="calTotal">0 سعر</span></div>
         <div style="display:flex;gap:9px;margin-top:11px">
-          <input type="number" id="calInput" inputmode="numeric" placeholder="سعرات" style="flex:1;text-align:center;font-weight:800">
+          <input type="text" id="calInput" inputmode="numeric" placeholder="سعرات" style="flex:1;text-align:center;font-weight:800">
           <input type="text" id="calLabel" placeholder="الصنف (اختياري)" style="flex:1.3">
           <button class="btn" style="width:auto;padding:11px 16px" onclick="addCal()">+</button>
         </div>
@@ -372,7 +372,7 @@
         <div class="lbl" style="margin-top:9px">سجّل سريع — اضغط الصنف</div>
         <div class="quickcal" id="protQuick"></div>
         <div style="display:flex;gap:9px;align-items:center;margin-top:10px">
-          <input type="number" id="protAdd" inputmode="numeric" placeholder="جم" style="flex:1">
+          <input type="text" id="protAdd" inputmode="numeric" placeholder="جم" style="flex:1">
           <button class="btn ghost sm" onclick="addProtein()">+ ضيف</button>
           <button class="btn ghost sm" onclick="protReset()">صفّر</button>
         </div>
@@ -390,13 +390,13 @@
       <div class="card">
         <div class="ch"><h3>📊 قياسات سريعة</h3></div>
         <div class="row3">
-          <div class="field"><label>خطوات</label><input type="number" id="steps" inputmode="numeric" placeholder="0" oninput="saveQuick()"></div>
-          <div class="field"><label>مشي (دقيقة)</label><input type="number" id="walkMin" inputmode="numeric" placeholder="0" oninput="saveQuick()"></div>
-          <div class="field"><label>مسافة (كم)</label><input type="number" id="walkKm" inputmode="decimal" step="0.1" placeholder="0" oninput="saveQuick()"></div>
+          <div class="field"><label>خطوات</label><input type="text" id="steps" inputmode="numeric" placeholder="0" oninput="saveQuick()"></div>
+          <div class="field"><label>مشي (دقيقة)</label><input type="text" id="walkMin" inputmode="numeric" placeholder="0" oninput="saveQuick()"></div>
+          <div class="field"><label>مسافة (كم)</label><input type="text" id="walkKm" inputmode="decimal" step="0.1" placeholder="0" oninput="saveQuick()"></div>
         </div>
         <div class="row2" style="margin-top:9px">
-          <div class="field"><label>نوم (ساعة)</label><input type="number" id="sleep" inputmode="decimal" placeholder="0" step="0.5" oninput="saveQuick()"></div>
-          <div class="field"><label>وزن الصبح</label><input type="number" id="wAM" inputmode="decimal" placeholder="—" step="0.1" oninput="saveQuick()"></div>
+          <div class="field"><label>نوم (ساعة)</label><input type="text" id="sleep" inputmode="decimal" placeholder="0" step="0.5" oninput="saveQuick()"></div>
+          <div class="field"><label>وزن الصبح</label><input type="text" id="wAM" inputmode="decimal" placeholder="—" step="0.1" oninput="saveQuick()"></div>
         </div>
         <div class="lbl" style="margin-top:12px">المزاج</div>
         <div class="moodrow" id="moodRow"></div>
@@ -441,7 +441,7 @@
       <div id="p-weight">
         <div class="card">
           <div class="ch"><h3>⚖️ سجّل وزنك</h3><span class="meta">أسبوعياً</span></div>
-          <div style="display:flex;gap:9px"><input type="number" id="wInput" inputmode="decimal" placeholder="مثال 92.5" step="0.1" style="text-align:center;font-size:18px;font-weight:800"><button class="btn" style="width:auto;padding:12px 20px" onclick="addWeight()">تسجيل</button></div>
+          <div style="display:flex;gap:9px"><input type="text" id="wInput" inputmode="decimal" placeholder="مثال 92.5" step="0.1" style="text-align:center;font-size:18px;font-weight:800"><button class="btn" style="width:auto;padding:12px 20px" onclick="addWeight()">تسجيل</button></div>
         </div>
         <div class="card">
           <div class="ch"><h3>📈 خط الوزن</h3><span class="meta">فعلي vs مستهدف</span></div>
@@ -460,10 +460,10 @@
         <div class="card">
           <div class="ch"><h3>📏 سجّل قياساتك</h3><span class="meta">سم</span></div>
           <div class="row2">
-            <div class="field"><label>الوسط (الكرش)</label><input type="number" id="mWaist" inputmode="decimal" placeholder="—"></div>
-            <div class="field"><label>الصدر</label><input type="number" id="mChest" inputmode="decimal" placeholder="—"></div>
-            <div class="field"><label>الفخذ</label><input type="number" id="mHip" inputmode="decimal" placeholder="—"></div>
-            <div class="field"><label>الذراع</label><input type="number" id="mArm" inputmode="decimal" placeholder="—"></div>
+            <div class="field"><label>الوسط (الكرش)</label><input type="text" id="mWaist" inputmode="decimal" placeholder="—"></div>
+            <div class="field"><label>الصدر</label><input type="text" id="mChest" inputmode="decimal" placeholder="—"></div>
+            <div class="field"><label>الفخذ</label><input type="text" id="mHip" inputmode="decimal" placeholder="—"></div>
+            <div class="field"><label>الذراع</label><input type="text" id="mArm" inputmode="decimal" placeholder="—"></div>
           </div>
           <button class="btn navy" style="margin-top:11px" onclick="addMeas()">حفظ القياسات</button>
           <div class="note">قيس الوسط كل أسبوعين — أحياناً الجسم بيشدّ والميزان ثابت.</div>
@@ -487,7 +487,7 @@
           <div class="ch"><h3>🧪 سجّل تحليل</h3></div>
           <div class="row2">
             <div class="field"><label>التحليل</label><select id="labType"></select></div>
-            <div class="field"><label>القيمة</label><input type="number" id="labVal" inputmode="decimal" step="0.1" placeholder="—"></div>
+            <div class="field"><label>القيمة</label><input type="text" id="labVal" inputmode="decimal" step="0.1" placeholder="—"></div>
             <div class="field"><label>التاريخ</label><input type="date" id="labDate"></div>
             <div class="field"><label>وحدة</label><input id="labUnit" placeholder="mg/dL"></div>
           </div>
@@ -558,14 +558,17 @@
         <div style="display:flex;justify-content:flex-start;margin-bottom:10px"><button class="btn ghost sm" onclick="lockSex()">🔒 رجوع</button></div>
       <div class="card">
         <div class="ch"><h3>💕 تسجيل جديد</h3></div>
-        <div class="lbl">مع مين</div>
-        <div class="sym-wrap" id="sxPartnerChips"></div>
-        <div style="margin:7px 0"><span class="small" onclick="togglePartnerEdit()" style="color:var(--teal);cursor:pointer;font-weight:700">تعديل القائمة ✎</span></div>
-        <div id="sxPartnerEdit" style="display:none;margin-bottom:6px"></div>
+        <div id="sxPartnerWho" class="lbl" style="display:none;font-size:14px;color:var(--teal);font-weight:800;margin-bottom:8px"></div>
+        <div id="sxPartnerPick">
+          <div class="lbl">مع مين</div>
+          <div class="sym-wrap" id="sxPartnerChips"></div>
+          <div style="margin:7px 0"><span class="small" onclick="togglePartnerEdit()" style="color:var(--teal);cursor:pointer;font-weight:700">تعديل القائمة ✎</span></div>
+          <div id="sxPartnerEdit" style="display:none;margin-bottom:6px"></div>
+        </div>
         <div class="row2">
           <div class="field"><label>فين</label><input id="sxPlace" placeholder="المكان"></div>
           <div class="field"><label>امتى (الوقت)</label><input id="sxTime" type="time"></div>
-          <div class="field"><label>المدة (دقيقة)</label><input id="sxDur" type="number" inputmode="numeric" placeholder="0"></div>
+          <div class="field"><label>المدة (دقيقة)</label><input id="sxDur" type="text" inputmode="numeric" placeholder="0"></div>
         </div>
         <div class="lbl" style="margin-top:11px">كامل ولا فوربلاي</div>
         <div class="seg" style="margin-bottom:2px"><button class="on" id="sxTypeFull" onclick="sxType('full')">كامل</button><button id="sxTypeFore" onclick="sxType('foreplay')">فوربلاي بس</button></div>
@@ -694,23 +697,23 @@
       <div class="card">
         <div class="ch"><h3>🎯 أهدافي (تحكّم كامل)</h3></div>
         <div class="row2">
-          <div class="field"><label>الاسم (للتقرير)</label><input type="text" id="setName" oninput="S().name=this.value;dbSave();renderAccount()"></div>
-          <div class="field"><label>السن</label><input type="number" id="setAge"></div>
-          <div class="field"><label>وزن البداية</label><input type="number" id="setStart" step="0.1"></div>
-          <div class="field"><label>وزن الهدف</label><input type="number" id="setGoal" step="0.1"></div>
-          <div class="field"><label>الطول (سم)</label><input type="number" id="setH"></div>
+          <div class="field"><label>الاسم (للتقرير)</label><input type="text" id="setName" oninput="updateName(this.value)"></div>
+          <div class="field"><label>السن</label><input type="text" inputmode="decimal" id="setAge"></div>
+          <div class="field"><label>وزن البداية</label><input type="text" inputmode="decimal" id="setStart" step="0.1"></div>
+          <div class="field"><label>وزن الهدف</label><input type="text" inputmode="decimal" id="setGoal" step="0.1"></div>
+          <div class="field"><label>الطول (سم)</label><input type="text" inputmode="decimal" id="setH"></div>
           <div class="field"><label>تاريخ البداية</label><input type="date" id="setDate"></div>
-          <div class="field"><label>هدف المياه (كوباية)</label><input type="number" id="setWater"></div>
-          <div class="field"><label>مدة الخطة (أسبوع)</label><input type="number" id="setWeeks"></div>
-          <div class="field"><label>سعرات يومية</label><input type="number" id="setKcal"></div>
-          <div class="field"><label>بروتين (جم)</label><input type="number" id="setProt"></div>
+          <div class="field"><label>هدف المياه (كوباية)</label><input type="text" inputmode="decimal" id="setWater"></div>
+          <div class="field"><label>مدة الخطة (أسبوع)</label><input type="text" inputmode="decimal" id="setWeeks"></div>
+          <div class="field"><label>سعرات يومية</label><input type="text" inputmode="decimal" id="setKcal"></div>
+          <div class="field"><label>بروتين (جم)</label><input type="text" inputmode="decimal" id="setProt"></div>
         </div>
         <button class="btn ghost sm" style="margin-top:9px;width:100%" onclick="calcProtein()">🧮 احسب هدف البروتين من وزني</button>
         <button class="btn" style="margin-top:12px" onclick="saveSettings()">حفظ الإعدادات</button>
       </div>
       <div class="card">
         <div class="ch"><h3>🍎 فواكهي المفضلة</h3></div>
-        <div class="field" style="margin-bottom:11px"><label>هدف حصص الفاكهة اليومي</label><input type="number" id="setFruitTarget"></div>
+        <div class="field" style="margin-bottom:11px"><label>هدف حصص الفاكهة اليومي</label><input type="text" inputmode="decimal" id="setFruitTarget"></div>
         <div class="lbl">اختار اللي بتحبها — هتظهرلك للتسجيل السريع في تبويب اليوم</div>
         <div class="sym-wrap" id="favFruitWrap"></div>
       </div>
@@ -766,7 +769,7 @@
         <button class="btn ghost" onclick="doSignOut()" style="margin-top:4px">🚪 تسجيل خروج (لوج آوت)</button>
       </div>
       <div class="card">
-        <div class="ch"><h3>🕶️ تمويه «خاص»</h3></div>
+        <div class="ch"><h3 id="stealthTitle">🕶️ تمويه «خاص»</h3></div>
         <div class="big-toggle" id="stealthToggle" onclick="toggleStealth()" style="margin-bottom:11px">
           <div><div style="font-weight:800;font-size:13.5px">إخفاء اسم التبويب</div><div style="font-size:11.5px;color:var(--muted)">يخلّي التبويب يظهر باسم محايد «أدوات»</div></div>
           <div class="switch"></div>
@@ -778,8 +781,6 @@
           <button class="btn ghost sm" onclick="addGateEmoji()">+ إضافة</button>
         </div>
         <div class="note" style="margin-top:8px">لو غيّرت الإيموجيهات، راجع التتابع السري لكل شريكة تحت إنه لسه بإيموجيهات موجودة.</div>
-        <div class="lbl" style="margin-top:14px">أكواد الشركاء (التتابع السري + الأيقونة + الصورة)</div>
-        <button class="btn ghost sm" id="cfgRevealBtn" style="margin:6px 0 4px" onclick="toggleCfgReveal()">👁️ إظهار الأكواد للتعديل</button>
         <div id="sexCfgList"></div>
       </div>
       <div class="card">
@@ -1246,9 +1247,9 @@ function renderLogged(){
   if(!t.exercise.length){empty.style.display="block";set("wkMeta","—");return;}empty.style.display="none";
   t.exercise.forEach((e,i)=>{const d=document.createElement("div");d.className="logged";
     d.innerHTML=`<div class="lh"><b>${e.name}</b><span class="x" onclick="rmEx(${i})">✕</span></div>
-    <div class="sr"><div class="field"><label>مجموعات</label><input type="number" value="${e.sets}" onchange="updEx(${i},'sets',this.value)"></div>
-    <div class="field"><label>عدات</label><input type="number" value="${e.reps}" onchange="updEx(${i},'reps',this.value)"></div>
-    <div class="field"><label>دقايق</label><input type="number" value="${e.dur}" placeholder="—" onchange="updEx(${i},'dur',this.value)"></div></div>`;
+    <div class="sr"><div class="field"><label>مجموعات</label><input type="text" inputmode="decimal" value="${e.sets}" onchange="updEx(${i},'sets',this.value)"></div>
+    <div class="field"><label>عدات</label><input type="text" inputmode="decimal" value="${e.reps}" onchange="updEx(${i},'reps',this.value)"></div>
+    <div class="field"><label>دقايق</label><input type="text" inputmode="decimal" value="${e.dur}" placeholder="—" onchange="updEx(${i},'dur',this.value)"></div></div>`;
     box.appendChild(d);});
   set("wkMeta",t.exercise.length+" تمرين");
 }
@@ -1270,7 +1271,7 @@ function renderPlan(){
 function renderRefs(){set("kcalRef","~"+S().kcal+" يومياً");set("protRef",S().protein+" جم");}
 
 /* SETTINGS */
-function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();cfgRevealed=false;const _rb=document.getElementById("cfgRevealBtn");if(_rb)_rb.textContent="👁️ إظهار الأكواد للتعديل";renderSexCfg();renderGateEmojiEdit();renderStealthToggle();}
+function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();cfgRevealed=false;renderSexCfg();renderGateEmojiEdit();renderStealthToggle();wireStealthReveal();}
 function saveSettings(){const s=S();
   s.name=gv("setName");s.age=gv("setAge");
   s.startW=+gv("setStart")||s.startW;s.goalW=+gv("setGoal")||s.goalW;s.heightCm=+gv("setH")||s.heightCm;
@@ -1793,6 +1794,8 @@ function pieBlock(svgId,legId,entries,center){
 }
 function renderSex(){
   renderPartnerChips();rPos();renderSxFilter();renderPosLib();renderEj();
+  const pick=document.getElementById("sxPartnerPick"),who=document.getElementById("sxPartnerWho");
+  if(pick&&who){if(curPartner){pick.style.display="none";who.style.display="block";who.textContent="💕 تسجيل مع: "+curPartner;}else{pick.style.display="block";who.style.display="none";}}
   const all=DB.sexLog||[];
   const log=sxFilter==="all"?all:all.filter(e=>e.partner===sxFilter);
   set("sxCount",all.length+" تسجيل"+(sxFilter!=="all"?(" · "+log.length+" مع "+esc(sxFilter)):""));
@@ -1930,10 +1933,16 @@ function renderPartnerHeader(name){const wrap=document.getElementById("partnerHe
 function renderGateEmojiEdit(){const w=document.getElementById("gateEmojiEdit");if(!w)return;w.innerHTML="";const arr=gateEmojis();const grid=document.createElement("div");grid.style.cssText="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px";arr.forEach((e,i)=>{const chip=document.createElement("div");chip.style.cssText="font-size:24px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:6px";chip.innerHTML=`<span>${e}</span>`;const x=document.createElement("span");x.textContent="✕";x.style.cssText="font-size:13px;color:var(--bad);cursor:pointer";x.onclick=()=>{if(DB.gateEmojis.length<=2){toast("لازم يفضل على الأقل ٢ إيموجي");return;}DB.gateEmojis.splice(i,1);dbSave();renderGateEmojiEdit();};chip.appendChild(x);grid.appendChild(chip);});w.appendChild(grid);}
 function addGateEmoji(){const v=(gv("newGateEmoji")||"").trim();if(!v)return;if(!DB.gateEmojis)DB.gateEmojis=[];if(DB.gateEmojis.includes(v)){toast("موجود بالفعل");return;}if(DB.gateEmojis.length>=12){toast("كفاية كده عشان اللوحة تفضل بسيطة");return;}DB.gateEmojis.push(v);dbSave();val("newGateEmoji","");renderGateEmojiEdit();}
 let cfgRevealed=false;
-function toggleCfgReveal(){cfgRevealed=!cfgRevealed;const b=document.getElementById("cfgRevealBtn");if(b)b.textContent=cfgRevealed?"🙈 إخفاء الأكواد":"👁️ إظهار الأكواد للتعديل";renderSexCfg();}
+function toggleCfgReveal(){cfgRevealed=!cfgRevealed;renderSexCfg();}
+function wireStealthReveal(){const t=document.getElementById("stealthTitle");if(!t||t._wired)return;t._wired=true;let timer=null;
+  const start=()=>{timer=setTimeout(()=>{toggleCfgReveal();if(navigator&&navigator.vibrate)navigator.vibrate(30);toast(cfgRevealed?"تم إظهار الأكواد":"اتخبّت");},650);};
+  const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
+  t.addEventListener("touchstart",start,{passive:true});t.addEventListener("touchend",cancel);t.addEventListener("touchmove",cancel);
+  t.addEventListener("mousedown",start);t.addEventListener("mouseup",cancel);t.addEventListener("mouseleave",cancel);
+}
 function renderSexCfg(){
   const wrap=document.getElementById("sexCfgList");if(!wrap)return;wrap.innerHTML="";
-  if(!cfgRevealed){wrap.innerHTML='<div class="small">🔒 الأكواد مخفية للحماية. اضغط «إظهار» علشان تشوفها أو تعدّلها. بتترجع متخفية أول ما تقفل الإعدادات.</div>';return;}
+  if(!cfgRevealed){return;}
   (DB.partners||[]).forEach((name,i)=>{const c=cfgFor(name);
     const card=document.createElement("div");card.className="poscard";
     const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px";head.textContent=(c.icon||"💠")+" "+name;card.appendChild(head);
@@ -1965,8 +1974,10 @@ function applyStealth(){const btn=document.getElementById("navSex");if(!btn)retu
 
 /* HELPERS */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function normDigits(s){return (s==null?"":String(s)).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/٫/g,".");}
+function updateName(v){const s=S();s.name=v;dbSave();set("profName",v||"المستخدم");const a=document.getElementById("profAvatar");if(a)a.textContent=(v&&v.trim()&&v.trim()[0])||"؟";}
 function val(id,v){const e=document.getElementById(id);if(e)e.value=v;}
-function gv(id){const e=document.getElementById(id);return e?e.value:"";}
+function gv(id){const e=document.getElementById(id);return e?normDigits(e.value):"";}
 function fmt(n){return (Math.round(n*10)/10).toString().replace(/\.0$/,"");}
 function fmtDate(iso){const[y,m,d]=iso.split("-");return d+"/"+m;}
 function checkDone(){const t=today();const done=t.water>=S().waterTarget&&t.meals.length>0&&t.meals.every(m=>m.done)&&t.exercise.length>0;document.getElementById("banner").classList.toggle("show",done);}
@@ -1976,8 +1987,8 @@ function computeStreak(){let st=0;const d=new Date();
     const active=day&&(day.water>0||mealsActive||(day.exercise&&day.exercise.length));
     if(active)st++;else if(i>0)break;d.setDate(d.getDate()-1);}
   set("streak",st);}
-function go(v){document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));document.getElementById("v-"+v).classList.add("active");
-  document.querySelectorAll(".nb").forEach(b=>b.classList.toggle("active",b.dataset.v===v));if(v==="progress")drawChart();if(v==="history")renderHistory();if(v==="sex"){if(curPartner)renderSex();else lockSex();}if(v==="settings")loadSettings();window.scrollTo(0,0);}
+function go(v){if(v!=="sex"&&curPartner){curPartner=null;}document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));document.getElementById("v-"+v).classList.add("active");
+  document.querySelectorAll(".nb").forEach(b=>b.classList.toggle("active",b.dataset.v===v));if(v==="progress")drawChart();if(v==="history")renderHistory();if(v==="sex"){lockSex();}if(v==="settings")loadSettings();window.scrollTo(0,0);}
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1900);}
 
 /* BOOT */
@@ -1991,7 +2002,8 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.cla
     else { showAuth(); }
   } else { hideAuth(); }
   renderAll(); applyStealth();
-  document.addEventListener("visibilitychange",()=>{if(document.hidden&&bioEnabled())showLock();});
+  document.addEventListener("input",e=>{const t=e.target;if(t&&t.tagName==="INPUT"&&/numeric|decimal/.test(t.getAttribute("inputmode")||"")){const n=normDigits(t.value);if(n!==t.value){const p=t.selectionStart;t.value=n;try{t.setSelectionRange(p,p);}catch(_){}}}});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden){if(curPartner){curPartner=null;const sm=document.getElementById("sexMain"),sg=document.getElementById("sexGate");if(sm)sm.style.display="none";if(sg)sg.style.display="block";gateSeq=[];const gs=document.getElementById("gateSeq");if(gs)gs.textContent="";}if(bioEnabled())showLock();}});
   window.addEventListener("pagehide",()=>{if(bioEnabled())showLock();});
   checkReminders(); setInterval(checkReminders,30000);
 })();
