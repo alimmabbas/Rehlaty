@@ -92,8 +92,8 @@
   #sexGate{padding:34px 6px;text-align:center}
   .gatehint{color:var(--muted);font-size:13px;margin-bottom:14px}
   .gateseq{font-size:30px;min-height:42px;letter-spacing:4px;margin-bottom:16px}
-  .gatepad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:300px;margin:0 auto}
-  .gatekey{font-size:25px;padding:12px 0;border:1px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;-webkit-user-select:none;user-select:none}
+  .gatepad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:260px;margin:0 auto}
+  .gatekey{font-size:30px;padding:16px 0;border:1px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;-webkit-user-select:none;user-select:none}
   .gatekey:active{transform:scale(.93)}
   .phero{background:linear-gradient(135deg,var(--navy),#10106a);color:#fff;border-radius:18px;padding:18px}
   .phero-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -771,7 +771,14 @@
           <div><div style="font-weight:800;font-size:13.5px">إخفاء اسم التبويب</div><div style="font-size:11.5px;color:var(--muted)">يخلّي التبويب يظهر باسم محايد «أدوات»</div></div>
           <div class="switch"></div>
         </div>
-        <div class="lbl">لكل شريكة: تتابع إيموجي سري يفتح صفحتها + أيقونة + صورة متحركة</div>
+        <div class="lbl">إيموجيهات لوحة التمويه (دي اللي بتظهر في الشاشة)</div>
+        <div id="gateEmojiEdit"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="newGateEmoji" maxlength="4" placeholder="إيموجي جديد" style="flex:1">
+          <button class="btn ghost sm" onclick="addGateEmoji()">+ إضافة</button>
+        </div>
+        <div class="note" style="margin-top:8px">لو غيّرت الإيموجيهات، راجع التتابع السري لكل شريكة تحت إنه لسه بإيموجيهات موجودة.</div>
+        <div class="lbl" style="margin-top:14px">لكل شريكة: تتابع إيموجي سري يفتح صفحتها + أيقونة + صورة متحركة</div>
         <div id="sexCfgList"></div>
       </div>
       <div class="card">
@@ -863,7 +870,8 @@ const DEFAULT={
   positions:[],
   labs:[],
   avoidFoods:["المقليات والدهون المشبعة","العصائر المحلاة والمشروبات الغازية","الأكل الحرّيف جداً والشطة","الكافيين الزائد (قهوة/مشروبات طاقة)","الأطعمة المصنّعة واللانشون","الحلويات والسكريات المكررة","الوجبات الدسمة قبل النوم","البصل والثوم النيء (للقولون)","الإفراط في البقوليات دفعة واحدة (انتفاخ)","منتجات الألبان كاملة الدسم"],
-  partnerAlias:{}
+  partnerAlias:{},
+  gateEmojis:["🍒","🍑","💋","💙","❤️","🌕"]
 };
 let DB=null;
 function isoToday(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
@@ -871,7 +879,7 @@ const SUPA_URL="https://vkluqgeywxxcamtbsuwg.supabase.co";
 const SUPA_KEY="sb_publishable_SijlskhjR9LYw4aCudAH8g_9gLfTP0H";
 let supa=null, cloudTimer=null;
 function initSupabase(){ try{ if(window.supabase&&window.supabase.createClient){ supa=window.supabase.createClient(SUPA_URL,SUPA_KEY); } }catch(e){ supa=null; } }
-function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); if(!DB.partnerCfg||typeof DB.partnerCfg!=="object") DB.partnerCfg={}; }
+function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); if(!DB.partnerCfg||typeof DB.partnerCfg!=="object") DB.partnerCfg={}; if(!Array.isArray(DB.gateEmojis)||!DB.gateEmojis.length) DB.gateEmojis=structuredClone(DEFAULT.gateEmojis); }
 function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(KEY); DB=r?JSON.parse(r):structuredClone(DEFAULT); }catch(e){ DB=structuredClone(DEFAULT); } ensureShape(); }
 function dbSave(){ saveLocal(); scheduleCloudSync(); }
@@ -1261,7 +1269,7 @@ function renderPlan(){
 function renderRefs(){set("kcalRef","~"+S().kcal+" يومياً");set("protRef",S().protein+" جم");}
 
 /* SETTINGS */
-function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();renderSexCfg();renderStealthToggle();}
+function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();renderSexCfg();renderGateEmojiEdit();renderStealthToggle();}
 function saveSettings(){const s=S();
   s.name=gv("setName");s.age=gv("setAge");
   s.startW=+gv("setStart")||s.startW;s.goalW=+gv("setGoal")||s.goalW;s.heightCm=+gv("setH")||s.heightCm;
@@ -1899,10 +1907,10 @@ function renderBadges(){
 }
 
 /* SEX GATE + PARTNER PAGES */
-const GATE_EMOJIS=["🍎","🌙","⭐","🌹","🔥","💧","🍀","☀️","🌊","🎵","🍫","🦋","🌸","⚡","🌿","🎈"];
+function gateEmojis(){return (DB.gateEmojis&&DB.gateEmojis.length)?DB.gateEmojis:["🍒","🍑","💋","💙","❤️","🌕"];}
 let gateSeq=[],curPartner=null;
 function cfgFor(name){if(!DB.partnerCfg)DB.partnerCfg={};if(!DB.partnerCfg[name])DB.partnerCfg[name]={combo:[],icon:"💠",banner:"",bannerPos:"above"};const c=DB.partnerCfg[name];if(!Array.isArray(c.combo))c.combo=[];if(!c.icon)c.icon="💠";if(!c.bannerPos)c.bannerPos="above";if(c.banner===undefined)c.banner="";return c;}
-function renderGate(){const pad=document.getElementById("gatePad");if(pad){pad.innerHTML="";GATE_EMOJIS.forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.textContent=e;b.onclick=()=>gateTap(e);pad.appendChild(b);});}set("gateSeq",gateSeq.join(""));}
+function renderGate(){const pad=document.getElementById("gatePad");if(pad){pad.innerHTML="";gateEmojis().forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.textContent=e;b.onclick=()=>gateTap(e);pad.appendChild(b);});}set("gateSeq",gateSeq.join(""));}
 function gateTap(e){gateSeq.push(e);if(gateSeq.length>8)gateSeq.shift();set("gateSeq",gateSeq.join(""));checkGate();}
 function gateClear(){gateSeq=[];set("gateSeq","");}
 function checkGate(){for(const name of (DB.partners||[])){const c=cfgFor(name);if(c.combo.length&&c.combo.join("")===gateSeq.join("")){unlockPartner(name);return;}}}
@@ -1918,6 +1926,8 @@ function renderPartnerHeader(name){const wrap=document.getElementById("partnerHe
   wrap.innerHTML=c.banner&&c.bannerPos==="below"?(hero+ban):(ban+hero);
 }
 /* CONFIG (settings) */
+function renderGateEmojiEdit(){const w=document.getElementById("gateEmojiEdit");if(!w)return;w.innerHTML="";const arr=gateEmojis();const grid=document.createElement("div");grid.style.cssText="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px";arr.forEach((e,i)=>{const chip=document.createElement("div");chip.style.cssText="font-size:24px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:6px";chip.innerHTML=`<span>${e}</span>`;const x=document.createElement("span");x.textContent="✕";x.style.cssText="font-size:13px;color:var(--bad);cursor:pointer";x.onclick=()=>{if(DB.gateEmojis.length<=2){toast("لازم يفضل على الأقل ٢ إيموجي");return;}DB.gateEmojis.splice(i,1);dbSave();renderGateEmojiEdit();};chip.appendChild(x);grid.appendChild(chip);});w.appendChild(grid);}
+function addGateEmoji(){const v=(gv("newGateEmoji")||"").trim();if(!v)return;if(!DB.gateEmojis)DB.gateEmojis=[];if(DB.gateEmojis.includes(v)){toast("موجود بالفعل");return;}if(DB.gateEmojis.length>=12){toast("كفاية كده عشان اللوحة تفضل بسيطة");return;}DB.gateEmojis.push(v);dbSave();val("newGateEmoji","");renderGateEmojiEdit();}
 function renderSexCfg(){
   const wrap=document.getElementById("sexCfgList");if(!wrap)return;wrap.innerHTML="";
   (DB.partners||[]).forEach((name,i)=>{const c=cfgFor(name);
@@ -1925,7 +1935,7 @@ function renderSexCfg(){
     const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px";head.textContent=(c.icon||"💠")+" "+name;card.appendChild(head);
     const l1=document.createElement("div");l1.className="lbl";l1.textContent="التتابع السري (اضغط الإيموجيهات بالترتيب)";card.appendChild(l1);
     const seq=document.createElement("div");seq.className="gateseq";seq.style.fontSize="24px";seq.style.minHeight="32px";seq.textContent=c.combo.join("")||"—";card.appendChild(seq);
-    const pad=document.createElement("div");pad.className="gatepad";GATE_EMOJIS.forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.style.fontSize="20px";b.textContent=e;b.onclick=()=>{c.combo.push(e);if(c.combo.length>6)c.combo.shift();dbSave();seq.textContent=c.combo.join("");};pad.appendChild(b);});card.appendChild(pad);
+    const pad=document.createElement("div");pad.className="gatepad";gateEmojis().forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.style.fontSize="20px";b.textContent=e;b.onclick=()=>{c.combo.push(e);if(c.combo.length>6)c.combo.shift();dbSave();seq.textContent=c.combo.join("");};pad.appendChild(b);});card.appendChild(pad);
     const clr=document.createElement("button");clr.className="btn ghost sm";clr.style.marginTop="6px";clr.textContent="مسح التتابع";clr.onclick=()=>{c.combo=[];dbSave();seq.textContent="—";};card.appendChild(clr);
     const l2=document.createElement("div");l2.className="lbl";l2.style.marginTop="11px";l2.textContent="الأيقونة (إيموجي)";card.appendChild(l2);
     const ic=document.createElement("input");ic.value=c.icon||"";ic.maxLength=4;ic.placeholder="💠";ic.onchange=()=>{c.icon=ic.value.trim()||"💠";dbSave();head.textContent=c.icon+" "+name;renderSexCfg();};card.appendChild(ic);
