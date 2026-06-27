@@ -103,6 +103,22 @@
   .phero-stats div span{font-size:10px;color:#c9cbe0}
   .pbanner{width:100%;border-radius:16px;margin:0 0 12px;display:block;max-height:200px;object-fit:cover}
   .pbanner.below{margin:12px 0 0}
+  .extimer{cursor:pointer;font-size:18px}
+  .tmodal{position:fixed;inset:0;background:rgba(0,0,52,.72);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
+  .tmodal.show{display:flex}
+  .tbox{background:#fff;border-radius:22px;padding:26px 22px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .tname{font-weight:800;font-size:16px;color:var(--navy);margin-bottom:10px}
+  .tclock{font-size:64px;font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums;letter-spacing:2px;margin:6px 0 18px}
+  .tctrl{display:flex;gap:10px;align-items:center;justify-content:center}
+  .tadj{background:var(--line);border:none;border-radius:12px;padding:14px 0;font-weight:800;font-size:14px;color:var(--navy);width:64px;cursor:pointer;font-family:inherit}
+  .tstart{flex:1;background:var(--teal);color:#fff;border:none;border-radius:12px;padding:16px 0;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit}
+  #splash{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy),#10106a);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .35s}
+  #splash.hide{opacity:0;pointer-events:none}
+  .splogo{color:#fff;font-size:34px;font-weight:800;letter-spacing:1px}
+  .spdot{width:34px;height:34px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .meallbl{font-weight:800;font-size:13.5px;border:none;border-bottom:1px dashed var(--line);border-radius:0;padding:2px 0 4px;background:transparent;margin-bottom:4px}
+  .meallbl:focus{border-bottom-color:var(--teal);outline:none}
   .histday{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
   .hd-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer}
   .hd-date{font-weight:800;font-size:13px;color:var(--navy);min-width:48px}
@@ -282,6 +298,7 @@
 </style>
 </head>
 <body>
+<div id="splash"><div class="splogo">رحلتي</div><div class="spdot"></div></div>
 <div class="app">
   <header>
     <div class="htop">
@@ -486,12 +503,13 @@
         <div class="card">
           <div class="ch"><h3>🧪 سجّل تحليل</h3></div>
           <div class="row2">
-            <div class="field"><label>التحليل</label><select id="labType"></select></div>
+            <div class="field"><label>التحليل</label><select id="labType" onchange="renderLabs()"></select></div>
             <div class="field"><label>القيمة</label><input type="text" id="labVal" inputmode="decimal" step="0.1" placeholder="—"></div>
             <div class="field"><label>التاريخ</label><input type="date" id="labDate"></div>
             <div class="field"><label>وحدة</label><input id="labUnit" placeholder="mg/dL"></div>
           </div>
           <button class="btn navy" style="margin-top:11px" onclick="addLab()">حفظ التحليل</button>
+          <div class="small" id="labRangeHint" style="margin-top:8px;color:var(--teal)"></div>
           <div class="note">سجّل تحاليلك الدورية (الدهون، الكوليسترول، إنزيمات الكبد، السكر) وتابع الترند — وبيظهروا في تقرير الدكتور.</div>
         </div>
         <div class="card">
@@ -683,10 +701,20 @@
       </div>
       <div id="pl-prog" style="display:none">
         <div class="card">
-          <div class="ch"><h3>💪 البرنامج الرياضي</h3><span class="meta">٤ شهور</span></div>
-          <div class="phase"><h4>المرحلة ١ — التأسيس (أسبوع ١–٣)</h4><ul><li>مشي يومي: ابدأ ٢٥ دقيقة، زوّد ٥ كل أسبوع لحد ٤٥</li><li>مقاومة بوزن الجسم ٢×/أسبوع</li></ul></div>
-          <div class="phase"><h4>المرحلة ٢ — البناء (أسبوع ٤–٩)</h4><ul><li>مشي سريع ٤٥ دقيقة، ٥–٦ مرات/أسبوع</li><li>مقاومة ٣×/أسبوع بأوزان خفيفة</li><li>٢ جلسة كارديو متقطّع خفيف</li></ul></div>
-          <div class="phase"><h4>المرحلة ٣ — التكثيف (أسبوع ١٠–١٦)</h4><ul><li>مقاومة ٣–٤×/أسبوع بوزن أعلى</li><li>كارديو ٤–٥×/أسبوع متنوّع</li></ul></div>
+          <div class="ch"><h3>🏋️ برنامجي (تعديل وإضافة)</h3></div>
+          <div class="big-toggle" id="progToggle" onclick="toggleProgram()" style="margin-bottom:11px">
+            <div><div style="font-weight:800;font-size:13.5px">استخدم برنامجي بدل المقترح</div><div style="font-size:11.5px;color:var(--muted)">لما تفعّله، تمارين اليوم بتتحط من برنامجك</div></div>
+            <div class="switch"></div>
+          </div>
+          <div class="note">لكل يوم: حدّد نوعه وضيف تمارينه (تمرين + مجموعات + عدّات + دقايق). سيبه فاضي = يوم راحة.</div>
+          <div id="progDays" style="margin-top:6px"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>💪 البرنامج الرياضي</h3><span class="meta">٦ شهور</span></div>
+          <div class="phase"><h4>المرحلة ١ — التأسيس · تخسيس (أسبوع ١–٤)</h4><ul><li>مشي يومي: ابدأ ٢٥ دقيقة، زوّد ٥ كل أسبوع لحد ٤٥</li><li>مقاومة بوزن الجسم ٢×/أسبوع</li></ul></div>
+          <div class="phase"><h4>المرحلة ٢ — البناء · تخسيس (أسبوع ٥–١٠)</h4><ul><li>مشي سريع ٤٥ دقيقة، ٥–٦ مرات/أسبوع</li><li>مقاومة ٣×/أسبوع بأوزان خفيفة</li><li>٢ جلسة كارديو متقطّع خفيف</li></ul></div>
+          <div class="phase"><h4>المرحلة ٣ — التكثيف · تخسيس (أسبوع ١١–١٧)</h4><ul><li>مقاومة ٣–٤×/أسبوع بوزن أعلى</li><li>كارديو ٤–٥×/أسبوع متنوّع</li></ul></div>
+          <div class="phase"><h4>المرحلة ٤ — استعادة اللياقة والبناء (أسبوع ١٨–٢٦)</h4><ul><li>مقاومة ٤×/أسبوع بأوزان أعلى وتركيز على البناء العضلي</li><li>كارديو ٢×/أسبوع للمحافظة على اللياقة</li><li>زوّد السعرات تدريجياً مع البروتين لبناء العضل</li></ul></div>
           <div class="note">⚠️ متتمرّنش بعد الأكل مباشرة — استنى ٢–٣ ساعات بسبب الارتجاع.</div>
         </div>
       </div>
@@ -708,7 +736,8 @@
           <div class="field"><label>سعرات يومية</label><input type="text" inputmode="decimal" id="setKcal"></div>
           <div class="field"><label>بروتين (جم)</label><input type="text" inputmode="decimal" id="setProt"></div>
         </div>
-        <button class="btn ghost sm" style="margin-top:9px;width:100%" onclick="calcProtein()">🧮 احسب هدف البروتين من وزني</button>
+        <button class="btn ghost sm" style="margin-top:9px;width:100%" onclick="calcProtein()">🧮 احسب هدف البروتين (من وزن الهدف)</button>
+        <button class="btn ghost sm" style="margin-top:7px;width:100%" onclick="calcCalories()">🔥 احسب السعرات (عجز آمن)</button>
         <button class="btn" style="margin-top:12px" onclick="saveSettings()">حفظ الإعدادات</button>
       </div>
       <div class="card">
@@ -784,6 +813,25 @@
         <div id="sexCfgList"></div>
       </div>
       <div class="card">
+        <div class="ch"><h3>⚕️ تنبيه طبي وإرشادات أمان</h3></div>
+        <div class="phase"><h4>التطبيق مساعد مش بديل للدكتور</h4><ul>
+          <li>ده تطبيق متابعة شخصي — مش تشخيص ولا علاج. أي قرار طبي لازم يكون مع دكتورك.</li>
+          <li><b>جرثومة المعدة (H. pylori):</b> محتاجة علاج دوائي (مضادات حيوية) من الدكتور — متعتمدش على الأكل بس.</li>
+          <li><b>الكبد الدهني والدهون:</b> تابع تحاليلك دورياً (كل ٣–٦ شهور) وورِّيها لدكتورك.</li>
+        </ul></div>
+        <div class="phase"><h4>قبل التمرين</h4><ul>
+          <li>لو عندك ضغط/سكر/مشاكل قلب أو وزن زائد كبير، خُد موافقة الدكتور قبل التمارين الشديدة (كارديو متقطّع).</li>
+          <li>متتمرّنش بعد الأكل مباشرة — استنى ٢–٣ ساعات (بسبب الارتجاع والمعدة).</li>
+          <li>اشرب مياه، وابدأ تدريجي، ووقّف فوراً لو حسّيت بدوخة أو ألم في الصدر أو ضيق نفس شديد.</li>
+        </ul></div>
+        <div class="phase"><h4>التغذية الآمنة</h4><ul>
+          <li>السعرات الافتراضية (~١٥٠٠) حد أدنى مناسب للتخسيس — متنزّلش تحتها من غير إشراف طبي.</li>
+          <li>للقولون العصبي: لو صنف بيتعبك (بقول، عدس، بصل/ثوم نيء، تفاح، بطيخ، مانجو) قلّله وسجّله في «أكل أتجنّبه».</li>
+          <li>الفاكهة كاملة أحسن من العصير (أحسن لدهونك وكبدك)، وقلّل الفواكه المجففة (بلح/زبيب/تين).</li>
+        </ul></div>
+        <div class="note">⚠️ لو ظهرت أعراض إنذار (ألم صدر، دم في البراز/القيء، فقدان وزن غير مبرر، اصفرار، صعوبة بلع) → دكتور فوراً.</div>
+      </div>
+      <div class="card">
         <div class="ch"><h3>📄 تقرير للدكتور</h3></div>
         <div class="small" style="margin-bottom:11px">ملخص منظّم لآخر ٣٠ يوم (وزن، أعراض، إخراج، ضغط، أدوية، مؤشرات) تقدر تحفظه PDF أو تطبعه وتاخده معاك في الكشف.</div>
         <button class="btn navy" onclick="generateReport()">📄 اطبع / احفظ التقرير</button>
@@ -841,12 +889,27 @@
 <div id="lockOverlay">
   <div class="authbox" style="text-align:center" id="lockBox"></div>
 </div>
+<div id="timerModal" class="tmodal">
+  <div class="tbox">
+    <div class="tname" id="tName">تمرين</div>
+    <div class="tclock" id="tClock">01:00</div>
+    <div class="tctrl">
+      <button class="tadj" onclick="timerAdj(-30)">−٣٠</button>
+      <button class="tstart" id="tStart" onclick="timerToggle()">▶︎ ابدأ</button>
+      <button class="tadj" onclick="timerAdj(30)">+٣٠</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn ghost sm" style="flex:1" onclick="timerReset()">↺ إعادة</button>
+      <button class="btn ghost sm" style="flex:1" onclick="closeTimer()">إغلاق</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============ MINI DATABASE (storage adapter: Claude window.storage OR localStorage) ============ */
 const KEY="healthDB_v2";
 const DEFAULT={
-  settings:{name:"",age:"",startW:95,goalW:75,heightCm:174,startDate:isoToday(),weeks:16,waterTarget:8,kcal:1500,protein:130,lastExport:"",autoRemind:true,backupDays:1,favFruits:[],fruitTarget:2,stealth:false},
+  settings:{name:"",age:"",startW:95,goalW:75,heightCm:174,startDate:isoToday(),weeks:26,waterTarget:8,kcal:1500,protein:130,lastExport:"",autoRemind:true,backupDays:1,favFruits:[],fruitTarget:2,stealth:false},
   days:{}, weights:[], meas:[], meds:[], medLog:{},
   reminders:[
     {id:"r1",label:"اشرب مياه 💧",time:"10:00",on:true},
@@ -859,21 +922,16 @@ const DEFAULT={
     {id:"h2",name:"العصبية",type:"count",neg:true},
     {id:"h4",name:"الماستربيشن",type:"count",neg:false}
   ],
-  people:[
-    {id:"p1",name:"أمي",rel:"الأهل"},
-    {id:"p2",name:"أبويا",rel:"الأهل"},
-    {id:"p3",name:"آدم (ابني)",rel:"الأبناء"},
-    {id:"p4",name:"أميرة (زوجتي)",rel:"البيت الأول"},
-    {id:"p5",name:"مريم (زوجتي)",rel:"البيت التاني"}
-  ],
+  people:[],
   sexLog:[],
-  partners:["أميرة","مريم"],
+  partners:[],
   acts:[],
   positions:[],
   labs:[],
   avoidFoods:["المقليات والدهون المشبعة","العصائر المحلاة والمشروبات الغازية","الأكل الحرّيف جداً والشطة","الكافيين الزائد (قهوة/مشروبات طاقة)","الأطعمة المصنّعة واللانشون","الحلويات والسكريات المكررة","الوجبات الدسمة قبل النوم","البصل والثوم النيء (للقولون)","الإفراط في البقوليات دفعة واحدة (انتفاخ)","منتجات الألبان كاملة الدسم"],
   partnerAlias:{},
-  gateEmojis:["🍒","🍑","💋","💙","❤️","🌕"]
+  gateEmojis:["🍒","🍑","💋","💙","❤️","🌕"],
+  program:{enabled:false,days:{}}
 };
 let DB=null;
 function isoToday(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
@@ -881,7 +939,8 @@ const SUPA_URL="https://vkluqgeywxxcamtbsuwg.supabase.co";
 const SUPA_KEY="sb_publishable_SijlskhjR9LYw4aCudAH8g_9gLfTP0H";
 let supa=null, cloudTimer=null;
 function initSupabase(){ try{ if(window.supabase&&window.supabase.createClient){ supa=window.supabase.createClient(SUPA_URL,SUPA_KEY); } }catch(e){ supa=null; } }
-function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); if(!DB.partnerCfg||typeof DB.partnerCfg!=="object") DB.partnerCfg={}; if(!Array.isArray(DB.gateEmojis)||!DB.gateEmojis.length) DB.gateEmojis=structuredClone(DEFAULT.gateEmojis); }
+function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); if(!DB.partnerCfg||typeof DB.partnerCfg!=="object") DB.partnerCfg={}; if(!Array.isArray(DB.gateEmojis)||!DB.gateEmojis.length) DB.gateEmojis=structuredClone(DEFAULT.gateEmojis);
+  if(!DB._genericized){ if(Array.isArray(DB.partners)&&DB.partners.length===2&&DB.partners.includes("أميرة")&&DB.partners.includes("مريم")){DB.partners=[];DB.partnerCfg={};} if(Array.isArray(DB.people)){const seedIds=["p1","p2","p3","p4","p5"];DB.people=DB.people.filter(p=>!seedIds.includes(p.id));} DB._genericized=true; } if(DB.settings&&DB.settings.weeks===16)DB.settings.weeks=26; if(!DB.program||typeof DB.program!=="object")DB.program={enabled:false,days:{}}; if(!DB.program.days||typeof DB.program.days!=="object")DB.program.days={}; }
 function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(KEY); DB=r?JSON.parse(r):structuredClone(DEFAULT); }catch(e){ DB=structuredClone(DEFAULT); } ensureShape(); }
 function dbSave(){ saveLocal(); scheduleCloudSync(); }
@@ -1106,8 +1165,9 @@ function water(d){const t=today();t.water=Math.max(0,t.water+d);dbSave();renderW
 function renderMeals(){
   const t=today(),list=document.getElementById("mealList");list.innerHTML="";
   t.meals.forEach((m,i)=>{const on=m.done;const r=document.createElement("div");r.className="task"+(on?" done":"");
-    r.innerHTML=`<div class="box${on?' on':''}">${on?'✓':''}</div><div class="ttx" style="flex:1"><div class="t">${m.label}</div><input class="mealdesc" placeholder="الأكل..." value="${(m.desc||'').replace(/"/g,'&quot;')}"></div><span class="mealx">✕</span>`;
+    r.innerHTML=`<div class="box${on?' on':''}">${on?'✓':''}</div><div class="ttx" style="flex:1"><input class="meallbl" value="${(m.label||'').replace(/"/g,'&quot;')}" placeholder="اسم الوجبة"><input class="mealdesc" placeholder="الأكل..." value="${(m.desc||'').replace(/"/g,'&quot;')}"></div><span class="mealx">✕</span>`;
     r.querySelector(".box").onclick=()=>{m.done=!m.done;dbSave();renderMeals();checkDone();};
+    r.querySelector(".meallbl").onchange=e=>{m.label=e.target.value;dbSave();};
     r.querySelector(".mealdesc").onchange=e=>{m.desc=e.target.value;dbSave();};
     r.querySelector(".mealx").onclick=()=>{t.meals.splice(i,1);dbSave();renderMeals();checkDone();};
     list.appendChild(r);});
@@ -1190,12 +1250,18 @@ function delMeas(i){DB.meas.splice(i,1);dbSave();renderHist();}
 function segE(e,el){segEstate=e;document.querySelectorAll('[data-e]').forEach(b=>b.classList.toggle('on',b===el));set("libTitle",e==="body"?"تمارين بوزن الجسم":"تمارين بأجهزة");renderLib();}
 /* SUGGESTED WORKOUT (by week/phase) */
 function currentWeek(){const d=Math.floor((new Date()-new Date(S().startDate))/864e5);return Math.max(1,Math.floor(d/7)+1);}
-function currentPhase(){const w=currentWeek();return w<=3?1:w<=9?2:3;}
+function currentPhase(){const w=currentWeek();return w<=4?1:w<=10?2:w<=17?3:4;}
+function phaseInfo(){const ph=currentPhase();return {1:"التأسيس · تخسيس",2:"البناء · تخسيس",3:"التكثيف · تخسيس",4:"استعادة اللياقة والبناء"}[ph];}
 function suggestWorkout(){
-  const w=currentWeek(),ph=currentPhase(),dow=new Date().getDay();
+  const dow=new Date().getDay();
+  if(DB.program&&DB.program.enabled){const pd=DB.program.days&&DB.program.days[dow];const items=(pd&&Array.isArray(pd.items))?pd.items.filter(i=>i&&i.name&&i.name.trim()):[];const lbl=(pd&&pd.label&&pd.label.trim())||(items.length?"برنامجي":"راحة 😴");
+    if(!items.length)return{type:"rest",label:lbl||"راحة 😴",desc:"النهاردة مفيش تمارين في برنامجك.",items:[]};
+    return{type:"custom",label:lbl,desc:"برنامجك الخاص لليوم ده.",items:items.map(i=>({name:i.name,sets:+i.sets||1,reps:+i.reps||1,dur:i.dur||""}))};}
+  const w=currentWeek(),ph=currentPhase();
   const sched={1:{6:'res',0:'walk',1:'walk',2:'res',3:'walk',4:'walk',5:'rest'},
                2:{6:'res',0:'hiit',1:'res',2:'walk',3:'res',4:'hiit',5:'rest'},
-               3:{6:'res',0:'cardio',1:'res',2:'cardio',3:'res',4:'cardio',5:'rest'}}[ph];
+               3:{6:'res',0:'cardio',1:'res',2:'cardio',3:'res',4:'cardio',5:'rest'},
+               4:{6:'res',0:'res',1:'cardio',2:'res',3:'res',4:'cardio',5:'rest'}}[ph];
   const type=sched[dow]||'walk';
   const walkMin=ph===1?Math.min(45,25+(w-1)*5):45;
   if(type==='rest')return{type,label:'راحة 😴',desc:'النهاردة راحة. لو حابب امشِ خفيف ٢٠ دقيقة بس.',items:[]};
@@ -1203,6 +1269,8 @@ function suggestWorkout(){
   if(type==='hiit'||type==='cardio')return{type,label:'كارديو متقطّع ⚡',desc:'سخّن ٥ دقايق، بعدين دقيقة سريع / دقيقة عادي × ١٠، وبرّد ٥ دقايق.',items:[{name:'كارديو متقطّع',sets:1,reps:1,dur:30}]};
   const res=ph===1
     ?[['قرفصاء (Squat)',3,12],['ضغط (Push-up)',3,8],['جسر الأرداف (Glute bridge)',3,15],['سوبرمان',3,12],['بلانك (Plank)',3,1]]
+    :ph===4
+    ?[['قرفصاء بدمبل (Goblet squat)',4,10],['ضغط صدر بدمبل',4,10],['تجديف بدمبل (Row)',4,10],['رفعة رومانية (RDL)',4,10],['ضغط كتف (Shoulder press)',3,12],['بلانك (Plank)',3,1]]
     :[['قرفصاء بدمبل (Goblet squat)',3,12],['تجديف بدمبل (Row)',3,12],['ضغط صدر بدمبل',3,10],['رفعة رومانية (RDL)',3,10],['بلانك (Plank)',3,1]];
   return{type:'res',label:'مقاومة 🏋️',desc:`مقاومة لكل الجسم${ph>1?' (بأجهزة لو متاح، أو بوزن الجسم)':' بوزن الجسم'} — ريّح دقيقة بين المجموعات.`,
     items:res.map(r=>({name:r[0],sets:r[1],reps:r[2],dur:''}))};
@@ -1212,13 +1280,39 @@ function renderSuggest(){
   const s=suggestWorkout(),w=currentWeek(),ph=currentPhase(),over=currentWeek()>S().weeks;
   const maint=curWeight()<=S().goalW;
   const items=s.items.map(i=>`<div class="ml"><span class="l">${i.dur?i.dur+' د':i.sets+'×'+i.reps}</span><span>${i.name}</span></div>`).join("");
-  const head=maint?'🎉 وصلت لهدفك — وضع المحافظة':(over?'وضع المحافظة (بعد البرنامج)':'أسبوع '+w+' · مرحلة '+ph);
+  const head=maint?'🎉 وصلت لهدفك — وضع المحافظة':(over?'وضع المحافظة (بعد البرنامج)':'أسبوع '+w+' · '+phaseInfo());
   box.innerHTML=`<div class="ch"><h3>💡 تمرين النهاردة</h3><span class="meta">${head}</span></div>
     <div class="suggbig">${s.label}</div><div class="small" style="margin:6px 0 11px">${s.desc}</div>${items}
     <div class="small" style="margin-top:11px;color:#c9cbe0">✓ اتحطّت تلقائي في تمارين النهاردة تحت — عدّل أو شيل اللي عايزه.</div>
     ${s.items.length?`<button class="btn ghost sm" style="width:100%;margin-top:9px;background:rgba(255,255,255,.12);color:#fff;border:none" onclick="resetToSuggested()">↺ رجّع التمارين للمقترح</button>`:''}`;
 }
 function resetToSuggested(){const s=suggestWorkout(),t=today();t.exercise=s.items.map(i=>({name:i.name,sets:i.sets,reps:i.reps,dur:i.dur||""}));dbSave();renderLogged();renderTodayEx();renderSuggest();toast("رجّعنا التمارين المقترحة ✓");}
+/* EDITABLE PROGRAM */
+const DAYNAMES=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+function progDay(d){if(!DB.program)DB.program={enabled:false,days:{}};if(!DB.program.days)DB.program.days={};if(!DB.program.days[d])DB.program.days[d]={label:"",items:[]};const pd=DB.program.days[d];if(!Array.isArray(pd.items))pd.items=[];return pd;}
+function toggleProgram(){if(!DB.program)DB.program={enabled:false,days:{}};DB.program.enabled=!DB.program.enabled;dbSave();renderProgram();renderSuggest&&renderSuggest();toast(DB.program.enabled?"برنامجك بقى مفعّل":"رجعنا للمقترح التلقائي");}
+function renderProgram(){
+  const wrap=document.getElementById("progDays");if(!wrap)return;wrap.innerHTML="";
+  const tog=document.getElementById("progToggle");if(tog)tog.classList.toggle("on",!!(DB.program&&DB.program.enabled));
+  const order=[6,0,1,2,3,4,5];
+  order.forEach(d=>{const pd=progDay(d);const card=document.createElement("div");card.className="poscard";
+    const head=document.createElement("div");head.style.cssText="display:flex;gap:8px;align-items:center;margin-bottom:7px";
+    const dn=document.createElement("div");dn.style.cssText="font-weight:800;min-width:62px";dn.textContent=DAYNAMES[d];head.appendChild(dn);
+    const lin=document.createElement("input");lin.value=pd.label||"";lin.placeholder="نوع اليوم (مقاومة/مشي/راحة)";lin.style.flex="1";lin.onchange=()=>{pd.label=lin.value;dbSave();};head.appendChild(lin);
+    card.appendChild(head);
+    const itemsWrap=document.createElement("div");
+    pd.items.forEach((it,idx)=>{const row=document.createElement("div");row.style.cssText="display:flex;gap:5px;align-items:center;margin-bottom:6px";
+      const nm=document.createElement("input");nm.value=it.name||"";nm.placeholder="تمرين";nm.style.flex="2";nm.onchange=()=>{it.name=nm.value;dbSave();};
+      const st=document.createElement("input");st.value=it.sets||"";st.placeholder="مج";st.setAttribute("inputmode","numeric");st.style.width="42px";st.style.textAlign="center";st.onchange=()=>{it.sets=normDigits(st.value);dbSave();};
+      const rp=document.createElement("input");rp.value=it.reps||"";rp.placeholder="عد";rp.setAttribute("inputmode","numeric");rp.style.width="42px";rp.style.textAlign="center";rp.onchange=()=>{it.reps=normDigits(rp.value);dbSave();};
+      const du=document.createElement("input");du.value=it.dur||"";du.placeholder="دق";du.setAttribute("inputmode","numeric");du.style.width="42px";du.style.textAlign="center";du.onchange=()=>{it.dur=normDigits(du.value);dbSave();};
+      const x=document.createElement("span");x.textContent="✕";x.style.cssText="color:var(--bad);cursor:pointer;padding:0 4px";x.onclick=()=>{pd.items.splice(idx,1);dbSave();renderProgram();};
+      row.append(nm,st,rp,du,x);itemsWrap.appendChild(row);});
+    card.appendChild(itemsWrap);
+    const add=document.createElement("button");add.className="btn ghost sm";add.textContent="+ تمرين";add.onclick=()=>{pd.items.push({name:"",sets:3,reps:12,dur:""});dbSave();renderProgram();};
+    card.appendChild(add);
+    wrap.appendChild(card);});
+}
 
 function renderLib(){
   const lib=document.getElementById("exLib");lib.innerHTML="";
@@ -1246,19 +1340,42 @@ function renderLogged(){
   const t=today(),box=document.getElementById("loggedEx"),empty=document.getElementById("loggedEmpty");box.innerHTML="";
   if(!t.exercise.length){empty.style.display="block";set("wkMeta","—");return;}empty.style.display="none";
   t.exercise.forEach((e,i)=>{const d=document.createElement("div");d.className="logged";
-    d.innerHTML=`<div class="lh"><b>${e.name}</b><span class="x" onclick="rmEx(${i})">✕</span></div>
+    d.innerHTML=`<div class="lh"><b>${e.done?'✅ ':''}${e.name}</b><span style="display:flex;gap:10px;align-items:center"><span class="extimer" onclick="openTimer(${i})">⏱️</span><span class="x" onclick="rmEx(${i})">✕</span></span></div>
     <div class="sr"><div class="field"><label>مجموعات</label><input type="text" inputmode="decimal" value="${e.sets}" onchange="updEx(${i},'sets',this.value)"></div>
     <div class="field"><label>عدات</label><input type="text" inputmode="decimal" value="${e.reps}" onchange="updEx(${i},'reps',this.value)"></div>
     <div class="field"><label>دقايق</label><input type="text" inputmode="decimal" value="${e.dur}" placeholder="—" onchange="updEx(${i},'dur',this.value)"></div></div>`;
     box.appendChild(d);});
-  set("wkMeta",t.exercise.length+" تمرين");
+  set("wkMeta",t.exercise.filter(e=>e.done).length+" / "+t.exercise.length+" تمرين");
 }
 function updEx(i,f,v){today().exercise[i][f]=v;dbSave();renderTodayEx();}
 function rmEx(i){today().exercise.splice(i,1);dbSave();renderLogged();renderTodayEx();}
+/* EXERCISE COUNTDOWN TIMER */
+let timerState={i:-1,total:60,left:60,running:false,iv:null,ctx:null};
+function fmtClock(s){s=Math.max(0,Math.round(s));const m=Math.floor(s/60),x=s%60;return (m<10?"0":"")+m+":"+(x<10?"0":"")+x;}
+function tShow(){const c=document.getElementById("tClock");if(c)c.textContent=fmtClock(timerState.left);}
+function openTimer(i){const e=today().exercise[i];if(!e)return;const dur=parseFloat(normDigits(String(e.dur||"")))||0;const secs=dur>0?Math.round(dur*60):60;
+  clearInterval(timerState.iv);timerState={i:i,total:secs,left:secs,running:false,iv:null,ctx:timerState.ctx};
+  document.getElementById("tName").textContent=e.name;document.getElementById("tStart").textContent="▶︎ ابدأ";tShow();
+  document.getElementById("timerModal").classList.add("show");}
+function timerToggle(){
+  if(!timerState.ctx){try{timerState.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(_){}}
+  if(timerState.ctx&&timerState.ctx.state==="suspended")timerState.ctx.resume();
+  if(timerState.running){clearInterval(timerState.iv);timerState.running=false;document.getElementById("tStart").textContent="▶︎ استكمال";return;}
+  if(timerState.left<=0){timerState.left=timerState.total;tShow();}
+  timerState.running=true;document.getElementById("tStart").textContent="⏸ إيقاف";
+  timerState.iv=setInterval(()=>{timerState.left--;tShow();if(timerState.left<=0){clearInterval(timerState.iv);timerState.running=false;timerDone();}},1000);}
+function timerAdj(d){timerState.left=Math.max(0,timerState.left+d);if(timerState.left>timerState.total)timerState.total=timerState.left;tShow();}
+function timerReset(){clearInterval(timerState.iv);timerState.running=false;timerState.left=timerState.total;document.getElementById("tStart").textContent="▶︎ ابدأ";tShow();}
+function closeTimer(){clearInterval(timerState.iv);timerState.running=false;document.getElementById("timerModal").classList.remove("show");}
+function timerDone(){playAlarm();if(navigator.vibrate){try{navigator.vibrate([300,150,300,150,400]);}catch(_){}}
+  const e=today().exercise[timerState.i];if(e){e.done=true;dbSave();renderLogged();}
+  const c=document.getElementById("tClock");if(c)c.textContent="تم ✓";document.getElementById("tStart").textContent="▶︎ ابدأ";toast("خلص التمرين 💪");}
+function playAlarm(){try{const ctx=timerState.ctx||new (window.AudioContext||window.webkitAudioContext)();timerState.ctx=ctx;if(ctx.state==="suspended")ctx.resume();let t=ctx.currentTime;for(let k=0;k<5;k++){const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=k%2?660:990;o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.5,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.4);o.start(t);o.stop(t+0.42);t+=0.5;}}catch(e){}}
 
 /* PLAN */
 function segPL(p,el){segPLstate=p;document.querySelectorAll('[data-pl]').forEach(b=>b.classList.toggle('on',b===el));document.getElementById("pl-meals").style.display=p==="meals"?"block":"none";document.getElementById("pl-prog").style.display=p==="prog"?"block":"none";}
 function renderPlan(){
+  if(typeof renderProgram==="function")renderProgram();
   const wrap=document.getElementById("planAcc");wrap.innerHTML="";
   const wk=planRotation(isoToday())||{};const ti=new Date().getDay();
   const rotN=(((weekIndexOf(isoToday())%PLANS.length)+PLANS.length)%PLANS.length)+1;
@@ -1275,7 +1392,7 @@ function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age
 function saveSettings(){const s=S();
   s.name=gv("setName");s.age=gv("setAge");
   s.startW=+gv("setStart")||s.startW;s.goalW=+gv("setGoal")||s.goalW;s.heightCm=+gv("setH")||s.heightCm;
-  s.startDate=gv("setDate")||s.startDate;s.waterTarget=+gv("setWater")||8;s.weeks=+gv("setWeeks")||16;s.kcal=+gv("setKcal")||1500;s.protein=+gv("setProt")||130;s.fruitTarget=+gv("setFruitTarget")||2;
+  s.startDate=gv("setDate")||s.startDate;s.waterTarget=+gv("setWater")||8;s.weeks=+gv("setWeeks")||26;s.kcal=+gv("setKcal")||1500;s.protein=+gv("setProt")||130;s.fruitTarget=+gv("setFruitTarget")||2;
   if(DB.weights.length&&DB.weights[0].date===DB.weights[0].date){/* keep */}
   dbSave();renderAll();toast("اتحفظت الإعدادات ✓");}
 function renderMedManage(){const box=document.getElementById("medManage");box.innerHTML="";
@@ -1510,7 +1627,7 @@ function generateReport(){
   const walkAvg=avg(days.map(d=>d.walkMin)),walkKmTot=days.reduce((a,d)=>a+(+d.walkKm||0),0),walkDays=days.filter(d=>(+d.walkMin||0)>0).length;
   const protAvg=avg(days.map(d=>d.protein));
   const labLatest={};(DB.labs||[]).forEach(l=>{if(!labLatest[l.type]||l.date>labLatest[l.type].date)labLatest[l.type]=l;});
-  const labRows=Object.values(labLatest).map(l=>`<div class="rep-kv"><div class="k">${l.type}</div><div class="v">${l.value} ${l.unit||""} <span style="color:#999;font-size:11px">(${fmtDate(l.date)})</span></div>`).join("");
+  const labRows=Object.values(labLatest).map(l=>{const f=labFlag(l.type,l.value);const tag=f?` <span style="color:${f.color==='var(--good)'?'#1a9e6f':'#d8645c'};font-weight:700">(${f.txt})</span>`:"";const r=LABRANGES[l.type];return `<div class="rep-kv"><div class="k">${l.type}${r?'<br><span style="color:#999;font-size:10px">طبيعي: '+r.txt+'</span>':''}</div><div class="v">${l.value} ${l.unit||""}${tag} <span style="color:#999;font-size:11px">(${fmtDate(l.date)})</span></div>`;}).join("");
   const exDays=days.filter(d=>d.exercise&&d.exercise.length).length;
   // weight table
   const wRows=[...DB.weights].reverse().slice(0,14).map(p=>`<tr><td>${fmtDate(p.date)}</td><td>${p.w} كيلو</td></tr>`).join("");
@@ -1848,7 +1965,8 @@ function proteinTarget(){return S().protein||130;}
 function renderProtein(){const t=today();const cur=+t.protein||0,tgt=proteinTarget();set("protMeta",cur+" / "+tgt+" جم");const f=document.getElementById("protFill");if(f)f.style.width=Math.min(100,Math.round(cur/Math.max(1,tgt)*100))+"%";const q=document.getElementById("protQuick");if(q){q.innerHTML="";PROTQUICK.forEach(p=>{const e=document.createElement("div");e.className="qc";e.innerHTML=`${p[0]} <b>${p[1]}</b>`;e.onclick=()=>{t.protein=(+t.protein||0)+p[1];dbSave();renderProtein();};q.appendChild(e);});}}
 function addProtein(){const v=+gv("protAdd")||0;if(!v)return;const t=today();t.protein=(+t.protein||0)+v;val("protAdd","");dbSave();renderProtein();}
 function protReset(){today().protein="";dbSave();renderProtein();}
-function calcProtein(){const w=curWeight()||S().startW;const g=Math.round(w*1.6);val("setProt",g);toast("هدف مقترح: "+g+" جم (≈ ١.٦ × وزنك)");}
+function calcProtein(){const w=S().goalW||curWeight()||S().startW;const g=Math.round(w*1.6);val("setProt",g);toast("هدف مقترح: "+g+" جم (١.٦ × وزن الهدف — الأنسب للتخسيس)");}
+function calcCalories(){const w=curWeight()||S().startW;const h=S().heightCm||174;const age=+S().age||35;const bmr=10*w+6.25*h-5*age+5;const tdee=bmr*1.375;let target=Math.round((tdee-600)/50)*50;if(target<1500)target=1500;val("setKcal",target);toast("هدف مقترح: "+target+" سعرة (عجز آمن · حد أدنى ١٥٠٠)");}
 /* ADHKAR */
 const ADHKAR=[["quran","ورد القرآن"],["morning","أذكار الصباح"],["evening","أذكار المساء"]];
 function renderAdhkar(){const t=today(),list=document.getElementById("adhkarList");if(!list)return;list.innerHTML="";ADHKAR.forEach(a=>{const on=!!(t.adhkar&&t.adhkar[a[0]]);const r=document.createElement("div");r.className="task"+(on?" done":"");r.innerHTML=`<div class="box${on?' on':''}">${on?'✓':''}</div><div class="ttx"><div class="t">${a[1]}</div></div>`;r.querySelector(".box").onclick=()=>{if(!t.adhkar)t.adhkar={};t.adhkar[a[0]]=!on;dbSave();renderAdhkar();};list.appendChild(r);});set("adhkarMeta",ADHKAR.filter(a=>t.adhkar&&t.adhkar[a[0]]).length+" / 3");}
@@ -1857,13 +1975,28 @@ function renderAvoid(){const w=document.getElementById("avoidList");if(!w)return
 function addAvoid(){const v=(gv("newAvoid")||"").trim();if(!v)return;if(!DB.avoidFoods)DB.avoidFoods=[];DB.avoidFoods.push(v);dbSave();val("newAvoid","");renderAvoid();}
 /* LABS */
 const LABTYPES=["دهون ثلاثية (TG)","كوليسترول كلي","LDL","HDL","سكر صائم","HbA1c","ALT (إنزيم كبد)","AST (إنزيم كبد)","حمض اليوريك","فيتامين D"];
+// [نطاق طبيعي نصياً, الاتجاه السيئ (high=الارتفاع سيئ / low=الانخفاض سيئ), حد التحذير]
+const LABRANGES={
+ "دهون ثلاثية (TG)":{txt:"أقل من 150 mg/dL",bad:"high",limit:150},
+ "كوليسترول كلي":{txt:"أقل من 200 mg/dL",bad:"high",limit:200},
+ "LDL":{txt:"أقل من 100 mg/dL",bad:"high",limit:100},
+ "HDL":{txt:"أعلى من 40 mg/dL (الأعلى أحسن)",bad:"low",limit:40},
+ "سكر صائم":{txt:"70–99 mg/dL",bad:"high",limit:100},
+ "HbA1c":{txt:"أقل من 5.7%",bad:"high",limit:5.7},
+ "ALT (إنزيم كبد)":{txt:"أقل من ~40 U/L",bad:"high",limit:40},
+ "AST (إنزيم كبد)":{txt:"أقل من ~40 U/L",bad:"high",limit:40},
+ "حمض اليوريك":{txt:"3.4–7.0 mg/dL",bad:"high",limit:7},
+ "فيتامين D":{txt:"30–100 ng/mL (الأمثل ≥30)",bad:"low",limit:30}
+};
+function labFlag(type,value){const r=LABRANGES[type];if(!r||value===""||value==null||isNaN(value))return null;const v=+value;let ok;if(r.bad==="high")ok=v<r.limit;else ok=v>=r.limit;return ok?{txt:"طبيعي",color:"var(--good)"}:{txt:r.bad==="high"?"مرتفع":"منخفض",color:"var(--bad)"};}
 function renderLabs(){
   const sel=document.getElementById("labType");if(sel&&!sel._filled){sel.innerHTML=LABTYPES.map(t=>`<option>${t}</option>`).join("");sel._filled=true;}
   const dd=document.getElementById("labDate");if(dd&&!dd.value)dd.value=isoToday();
+  const rngEl=document.getElementById("labRangeHint");if(rngEl&&sel){const r=LABRANGES[sel.value];rngEl.textContent=r?("المعدل الطبيعي: "+r.txt):"";}
   const types=[...new Set((DB.labs||[]).map(l=>l.type))];
   const pick=document.getElementById("labPick");if(pick){const cur=pick.value;const opts=types.length?types:[LABTYPES[0]];pick.innerHTML=opts.map(t=>`<option>${t}</option>`).join("");if(cur&&types.includes(cur))pick.value=cur;}
   drawLabChart();
-  const h=document.getElementById("labHist");if(h){h.innerHTML=(DB.labs||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map(l=>`<div class="hist-row"><span>${fmtDate(l.date)} · ${esc(l.type)}</span><span><b>${l.value}</b> ${esc(l.unit||"")} <span class="del" onclick="rmLab('${l.id}')">✕</span></span></div>`).join("")||'<div class="small">لسه مفيش تحاليل</div>';}
+  const h=document.getElementById("labHist");if(h){h.innerHTML=(DB.labs||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map(l=>{const f=labFlag(l.type,l.value);const tag=f?` <span style="color:${f.color};font-weight:700;font-size:11px">(${f.txt})</span>`:"";return `<div class="hist-row"><span>${fmtDate(l.date)} · ${esc(l.type)}</span><span><b>${l.value}</b> ${esc(l.unit||"")}${tag} <span class="del" onclick="rmLab('${l.id}')">✕</span></span></div>`;}).join("")||'<div class="small">لسه مفيش تحاليل</div>';}
 }
 function addLab(){const type=gv("labType"),value=+gv("labVal"),date=gv("labDate")||isoToday(),unit=gv("labUnit").trim();if(!value){toast("اكتب قيمة");return;}if(!DB.labs)DB.labs=[];DB.labs.push({id:"l"+Date.now(),type,value,date,unit});dbSave();val("labVal","");renderLabs();toast("اتسجّل ✓");}
 function rmLab(id){DB.labs=(DB.labs||[]).filter(l=>l.id!==id);dbSave();renderLabs();}
@@ -2006,6 +2139,7 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.cla
   document.addEventListener("visibilitychange",()=>{if(document.hidden){if(curPartner){curPartner=null;const sm=document.getElementById("sexMain"),sg=document.getElementById("sexGate");if(sm)sm.style.display="none";if(sg)sg.style.display="block";gateSeq=[];const gs=document.getElementById("gateSeq");if(gs)gs.textContent="";}if(bioEnabled())showLock();}});
   window.addEventListener("pagehide",()=>{if(bioEnabled())showLock();});
   checkReminders(); setInterval(checkReminders,30000);
+  const _sp=document.getElementById("splash");if(_sp){_sp.classList.add("hide");setTimeout(()=>{_sp.style.display="none";},400);}
 })();
 </script>
 </body>
