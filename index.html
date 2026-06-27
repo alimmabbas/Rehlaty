@@ -85,6 +85,9 @@
   .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
   .lname{flex:1;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lval{color:var(--muted);font-weight:700;font-size:11.5px;flex-shrink:0}
+  .pill{padding:12px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:13px;color:var(--muted);cursor:pointer;transition:.15s;-webkit-user-select:none;user-select:none}
+  .pill.on{background:var(--teal-soft);border-color:var(--teal);color:var(--teal)}
+  .pill:active{transform:scale(.97)}
   .histday{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
   .hd-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer}
   .hd-date{font-weight:800;font-size:13px;color:var(--navy);min-width:48px}
@@ -542,14 +545,8 @@
         </div>
         <div class="lbl" style="margin-top:11px">كامل ولا فوربلاي</div>
         <div class="seg" style="margin-bottom:2px"><button class="on" id="sxTypeFull" onclick="sxType('full')">كامل</button><button id="sxTypeFore" onclick="sxType('foreplay')">فوربلاي بس</button></div>
-        <div class="lbl" style="margin-top:10px">نوع النشاط (للطرفين) — اكتبه بطريقتك</div>
-        <div class="sym-wrap" id="sxActChips"></div>
-        <div style="display:flex;gap:8px;margin-top:7px">
-          <input id="newAct" style="flex:1" placeholder="اكتب نوع وأضفه">
-          <button class="btn ghost sm" onclick="addActInline()">+ إضافة</button>
-        </div>
-        <div style="margin:6px 0"><span class="small" onclick="tgEdit('sxActEdit','acts',rActs)" style="color:var(--teal);cursor:pointer;font-weight:700">تعديل القائمة ✎</span></div>
-        <div id="sxActEdit" style="display:none;margin-bottom:6px"></div>
+        <div class="lbl" style="margin-top:10px">نوع النشاط (اكتبه براحتك — افصل بفاصلة لو أكتر من نوع)</div>
+        <input id="sxActText" placeholder="اكتب نوع النشاط هنا...">
         <div class="lbl" style="margin-top:6px">الوضع <span class="small" style="font-weight:600">(تضيفهم بصورهم من «مكتبة الأوضاع» تحت)</span></div>
         <div class="sym-wrap" id="sxPosChips"></div>
         <div class="lbl" style="margin-top:10px">الأورجازم</div>
@@ -1721,12 +1718,13 @@ function listManage(eid,arr,refresh){const e=document.getElementById(eid);if(!e)
   add.appendChild(ai);add.appendChild(ab);e.appendChild(add);}
 function renderSxFilter(){const w=document.getElementById("sxFilterChips");if(!w)return;w.innerHTML="";["all"].concat(DB.partners||[]).forEach(p=>{const on=sxFilter===p;const c=document.createElement("div");c.className="favsel"+(on?" on":"");c.textContent=p==="all"?"الكل":p;c.onclick=()=>{sxFilter=p;renderSex();};w.appendChild(c);});}
 function addSex(){
-  const e={id:"s"+Date.now(),date:isoToday(),partner:sxDraft.partner||"",place:gv("sxPlace").trim(),time:gv("sxTime"),duration:+gv("sxDur")||0,type:sxDraft.type,acts:[...sxDraft.acts],positions:[...sxDraft.positions],orgYou:sxDraft.orgYou,orgPartner:sxDraft.orgPartner,ejYou:sxDraft.ejYou,ejPartner:sxDraft.ejPartner,ejWhere:sxDraft.ejWhere||"",special:gv("sxSpecial").trim(),how:gv("sxHow").trim()};
+  const acts=gv("sxActText").split(/[،,\/\n]+/).map(s=>s.trim()).filter(Boolean);
+  const e={id:"s"+Date.now(),date:isoToday(),partner:sxDraft.partner||"",place:gv("sxPlace").trim(),time:gv("sxTime"),duration:+gv("sxDur")||0,type:sxDraft.type,acts:acts,positions:[...sxDraft.positions],orgYou:sxDraft.orgYou,orgPartner:sxDraft.orgPartner,ejYou:sxDraft.ejYou,ejPartner:sxDraft.ejPartner,ejWhere:sxDraft.ejWhere||"",special:gv("sxSpecial").trim(),how:gv("sxHow").trim()};
   if(!DB.sexLog)DB.sexLog=[];DB.sexLog.push(e);dbSave();
-  ["sxPlace","sxTime","sxDur","sxSpecial","sxHow"].forEach(id=>val(id,""));
+  ["sxPlace","sxTime","sxDur","sxActText","sxSpecial","sxHow"].forEach(id=>val(id,""));
   sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[],ejYou:false,ejPartner:false,ejWhere:""};sxType("full");
   document.getElementById("sxOrgYou").classList.remove("on");document.getElementById("sxOrgPartner").classList.remove("on");
-  renderPartnerChips();rActs();rPos();renderEj();renderSex();toast("اتسجّل ✓");
+  renderPartnerChips();rPos();renderEj();renderSex();toast("اتسجّل ✓");
 }
 function rmSex(id){DB.sexLog=(DB.sexLog||[]).filter(x=>x.id!==id);dbSave();renderSex();}
 function stripT(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
@@ -1750,7 +1748,7 @@ function pieBlock(svgId,legId,entries,center){
   const leg=document.getElementById(legId);if(leg){const tot=segs.reduce((a,s)=>a+s.value,0);leg.innerHTML=segs.length?segs.map(s=>`<div class="legrow"><span class="dot" style="background:${s.color}"></span><span class="lname">${esc(s.label)}</span><span class="lval">${s.value}${tot?(" · "+Math.round(s.value/tot*100)+"٪"):""}</span></div>`).join(""):'<div class="small">لا يوجد</div>';}
 }
 function renderSex(){
-  renderPartnerChips();rActs();rPos();renderSxFilter();renderPosLib();renderEj();
+  renderPartnerChips();rPos();renderSxFilter();renderPosLib();renderEj();
   const all=DB.sexLog||[];
   const log=sxFilter==="all"?all:all.filter(e=>e.partner===sxFilter);
   set("sxCount",all.length+" تسجيل"+(sxFilter!=="all"?(" · "+log.length+" مع "+esc(sxFilter)):""));
