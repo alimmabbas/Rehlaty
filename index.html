@@ -89,6 +89,20 @@
   .pill.on{background:var(--teal);border-color:var(--teal);color:#fff}
   .pill.on::before{content:"✓ "}
   .pill:active{transform:scale(.97)}
+  #sexGate{padding:34px 6px;text-align:center}
+  .gatehint{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .gateseq{font-size:30px;min-height:42px;letter-spacing:4px;margin-bottom:16px}
+  .gatepad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:300px;margin:0 auto}
+  .gatekey{font-size:25px;padding:12px 0;border:1px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;-webkit-user-select:none;user-select:none}
+  .gatekey:active{transform:scale(.93)}
+  .phero{background:linear-gradient(135deg,var(--navy),#10106a);color:#fff;border-radius:18px;padding:18px}
+  .phero-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .phero-icon{font-size:30px}.phero-name{font-size:20px;font-weight:800}
+  .phero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+  .phero-stats div b{display:block;font-size:18px;font-weight:800}
+  .phero-stats div span{font-size:10px;color:#c9cbe0}
+  .pbanner{width:100%;border-radius:16px;margin:0 0 12px;display:block;max-height:200px;object-fit:cover}
+  .pbanner.below{margin:12px 0 0}
   .histday{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
   .hd-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer}
   .hd-date{font-weight:800;font-size:13px;color:var(--navy);min-width:48px}
@@ -533,6 +547,15 @@
 
     <!-- PRIVATE / SEX LIFE -->
     <section class="view" id="v-sex">
+      <div id="sexGate">
+        <div class="gatehint" id="gateHint">لوحة</div>
+        <div class="gateseq" id="gateSeq"></div>
+        <div class="gatepad" id="gatePad"></div>
+        <div style="text-align:center;margin-top:14px"><span class="small" onclick="gateClear()" style="color:var(--muted);cursor:pointer">مسح</span></div>
+      </div>
+      <div id="sexMain" style="display:none">
+        <div id="partnerHeaderWrap"></div>
+        <div style="display:flex;justify-content:flex-start;margin-bottom:10px"><button class="btn ghost sm" onclick="lockSex()">🔒 رجوع</button></div>
       <div class="card">
         <div class="ch"><h3>💕 تسجيل جديد</h3></div>
         <div class="lbl">مع مين</div>
@@ -609,6 +632,7 @@
         <div class="ch"><h3>🗒️ السجل</h3></div>
         <div id="sxList"></div>
         <div class="small" id="sxEmpty" style="display:none">لسه مفيش تسجيلات</div>
+      </div>
       </div>
     </section>
 
@@ -742,6 +766,15 @@
         <button class="btn ghost" onclick="doSignOut()" style="margin-top:4px">🚪 تسجيل خروج (لوج آوت)</button>
       </div>
       <div class="card">
+        <div class="ch"><h3>🕶️ تمويه «خاص»</h3></div>
+        <div class="big-toggle" id="stealthToggle" onclick="toggleStealth()" style="margin-bottom:11px">
+          <div><div style="font-weight:800;font-size:13.5px">إخفاء اسم التبويب</div><div style="font-size:11.5px;color:var(--muted)">يخلّي التبويب يظهر باسم محايد «أدوات»</div></div>
+          <div class="switch"></div>
+        </div>
+        <div class="lbl">لكل شريكة: تتابع إيموجي سري يفتح صفحتها + أيقونة + صورة متحركة</div>
+        <div id="sexCfgList"></div>
+      </div>
+      <div class="card">
         <div class="ch"><h3>📄 تقرير للدكتور</h3></div>
         <div class="small" style="margin-bottom:11px">ملخص منظّم لآخر ٣٠ يوم (وزن، أعراض، إخراج، ضغط، أدوية، مؤشرات) تقدر تحفظه PDF أو تطبعه وتاخده معاك في الكشف.</div>
         <button class="btn navy" onclick="generateReport()">📄 اطبع / احفظ التقرير</button>
@@ -769,7 +802,7 @@
     <button class="nb active" data-v="today" onclick="go('today')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>اليوم</button>
     <button class="nb" data-v="progress" onclick="go('progress')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M19 9l-5 5-4-4-3 3"/></svg>التقدم</button>
     <button class="nb" data-v="social" onclick="go('social')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>العيلة</button>
-    <button class="nb" data-v="sex" onclick="go('sex')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>خاص</button>
+    <button class="nb" id="navSex" data-v="sex" onclick="go('sex')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>خاص</button>
     <button class="nb" data-v="history" onclick="go('history')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>السجل</button>
     <button class="nb" data-v="workouts" onclick="go('workouts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12"/><path d="M4 9l-2 2 3 3 2-2"/><path d="M20 15l2-2-3-3-2 2"/></svg>التمارين</button>
     <button class="nb" data-v="plan" onclick="go('plan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>الخطة</button>
@@ -804,7 +837,7 @@
 /* ============ MINI DATABASE (storage adapter: Claude window.storage OR localStorage) ============ */
 const KEY="healthDB_v2";
 const DEFAULT={
-  settings:{name:"",age:"",startW:95,goalW:75,heightCm:174,startDate:isoToday(),weeks:16,waterTarget:8,kcal:1500,protein:130,lastExport:"",autoRemind:true,backupDays:1,favFruits:[],fruitTarget:2},
+  settings:{name:"",age:"",startW:95,goalW:75,heightCm:174,startDate:isoToday(),weeks:16,waterTarget:8,kcal:1500,protein:130,lastExport:"",autoRemind:true,backupDays:1,favFruits:[],fruitTarget:2,stealth:false},
   days:{}, weights:[], meas:[], meds:[], medLog:{},
   reminders:[
     {id:"r1",label:"اشرب مياه 💧",time:"10:00",on:true},
@@ -829,7 +862,8 @@ const DEFAULT={
   acts:[],
   positions:[],
   labs:[],
-  avoidFoods:["المقليات والدهون المشبعة","العصائر المحلاة والمشروبات الغازية","الأكل الحرّيف جداً والشطة","الكافيين الزائد (قهوة/مشروبات طاقة)","الأطعمة المصنّعة واللانشون","الحلويات والسكريات المكررة","الوجبات الدسمة قبل النوم","البصل والثوم النيء (للقولون)","الإفراط في البقوليات دفعة واحدة (انتفاخ)","منتجات الألبان كاملة الدسم"]
+  avoidFoods:["المقليات والدهون المشبعة","العصائر المحلاة والمشروبات الغازية","الأكل الحرّيف جداً والشطة","الكافيين الزائد (قهوة/مشروبات طاقة)","الأطعمة المصنّعة واللانشون","الحلويات والسكريات المكررة","الوجبات الدسمة قبل النوم","البصل والثوم النيء (للقولون)","الإفراط في البقوليات دفعة واحدة (انتفاخ)","منتجات الألبان كاملة الدسم"],
+  partnerAlias:{}
 };
 let DB=null;
 function isoToday(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
@@ -837,7 +871,7 @@ const SUPA_URL="https://vkluqgeywxxcamtbsuwg.supabase.co";
 const SUPA_KEY="sb_publishable_SijlskhjR9LYw4aCudAH8g_9gLfTP0H";
 let supa=null, cloudTimer=null;
 function initSupabase(){ try{ if(window.supabase&&window.supabase.createClient){ supa=window.supabase.createClient(SUPA_URL,SUPA_KEY); } }catch(e){ supa=null; } }
-function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); }
+function ensureShape(){ if(!DB||typeof DB!=="object")DB=structuredClone(DEFAULT); for(const k in DEFAULT) if(DB[k]===undefined) DB[k]=structuredClone(DEFAULT[k]); if(!DB.settings)DB.settings=structuredClone(DEFAULT.settings); if(!DB.weights||!DB.weights.length) DB.weights=[{date:DB.settings.startDate,w:DB.settings.startW}]; if(Array.isArray(DB.habits)) DB.habits=DB.habits.filter(h=>h&&h.name!=="السكس"); if(!Array.isArray(DB.sexLog)) DB.sexLog=[]; if(!Array.isArray(DB.partners)||!DB.partners.length) DB.partners=["أميرة","مريم"]; if(!Array.isArray(DB.acts)) DB.acts=[]; if(!Array.isArray(DB.positions)) DB.positions=[]; DB.positions=DB.positions.map(p=> typeof p==="string"?{id:"pos"+Math.random().toString(36).slice(2,8),name:p,note:"",imgs:[],links:[]}:(p&&typeof p==="object"?{id:p.id||"pos"+Math.random().toString(36).slice(2,8),name:p.name||"",note:p.note||"",imgs:Array.isArray(p.imgs)?p.imgs:[],links:Array.isArray(p.links)?p.links:[]}:null)).filter(Boolean); if(!Array.isArray(DB.labs)) DB.labs=[]; if(!Array.isArray(DB.avoidFoods)) DB.avoidFoods=structuredClone(DEFAULT.avoidFoods); if(!DB.partnerCfg||typeof DB.partnerCfg!=="object") DB.partnerCfg={}; }
 function saveLocal(){ try{ localStorage.setItem(KEY,JSON.stringify(DB)); }catch(e){} }
 function loadLocal(){ try{ const r=localStorage.getItem(KEY); DB=r?JSON.parse(r):structuredClone(DEFAULT); }catch(e){ DB=structuredClone(DEFAULT); } ensureShape(); }
 function dbSave(){ saveLocal(); scheduleCloudSync(); }
@@ -1227,7 +1261,7 @@ function renderPlan(){
 function renderRefs(){set("kcalRef","~"+S().kcal+" يومياً");set("protRef",S().protein+" جم");}
 
 /* SETTINGS */
-function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();}
+function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();renderSexCfg();renderStealthToggle();}
 function saveSettings(){const s=S();
   s.name=gv("setName");s.age=gv("setAge");
   s.startW=+gv("setStart")||s.startW;s.goalW=+gv("setGoal")||s.goalW;s.heightCm=+gv("setH")||s.heightCm;
@@ -1723,7 +1757,7 @@ function addSex(){
   const e={id:"s"+Date.now(),date:isoToday(),partner:sxDraft.partner||"",place:gv("sxPlace").trim(),time:gv("sxTime"),duration:+gv("sxDur")||0,type:sxDraft.type,acts:acts,positions:[...sxDraft.positions],orgYou:sxDraft.orgYou,orgPartner:sxDraft.orgPartner,ejYou:sxDraft.ejYou,ejPartner:sxDraft.ejPartner,ejWhere:sxDraft.ejWhere||"",special:gv("sxSpecial").trim(),how:gv("sxHow").trim()};
   if(!DB.sexLog)DB.sexLog=[];DB.sexLog.push(e);dbSave();
   ["sxPlace","sxTime","sxDur","sxActText","sxSpecial","sxHow"].forEach(id=>val(id,""));
-  sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[],ejYou:false,ejPartner:false,ejWhere:""};sxType("full");
+  sxDraft={type:"full",orgYou:false,orgPartner:false,partner:"",acts:[],positions:[],ejYou:false,ejPartner:false,ejWhere:""};if(curPartner)sxDraft.partner=curPartner;sxType("full");
   document.getElementById("sxOrgYou").classList.remove("on");document.getElementById("sxOrgPartner").classList.remove("on");
   renderPartnerChips();rPos();renderEj();renderSex();toast("اتسجّل ✓");
 }
@@ -1864,6 +1898,57 @@ function renderBadges(){
   box.innerHTML=b.length?('<div class="lbl" style="margin-top:12px">إنجازاتك</div><div class="badgewrap">'+b.map(x=>`<span class="badge">${x}</span>`).join("")+"</div>"):"";
 }
 
+/* SEX GATE + PARTNER PAGES */
+const GATE_EMOJIS=["🍎","🌙","⭐","🌹","🔥","💧","🍀","☀️","🌊","🎵","🍫","🦋","🌸","⚡","🌿","🎈"];
+let gateSeq=[],curPartner=null;
+function cfgFor(name){if(!DB.partnerCfg)DB.partnerCfg={};if(!DB.partnerCfg[name])DB.partnerCfg[name]={combo:[],icon:"💠",banner:"",bannerPos:"above"};const c=DB.partnerCfg[name];if(!Array.isArray(c.combo))c.combo=[];if(!c.icon)c.icon="💠";if(!c.bannerPos)c.bannerPos="above";if(c.banner===undefined)c.banner="";return c;}
+function renderGate(){const pad=document.getElementById("gatePad");if(pad){pad.innerHTML="";GATE_EMOJIS.forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.textContent=e;b.onclick=()=>gateTap(e);pad.appendChild(b);});}set("gateSeq",gateSeq.join(""));}
+function gateTap(e){gateSeq.push(e);if(gateSeq.length>8)gateSeq.shift();set("gateSeq",gateSeq.join(""));checkGate();}
+function gateClear(){gateSeq=[];set("gateSeq","");}
+function checkGate(){for(const name of (DB.partners||[])){const c=cfgFor(name);if(c.combo.length&&c.combo.join("")===gateSeq.join("")){unlockPartner(name);return;}}}
+function unlockPartner(name){curPartner=name;sxFilter=name;sxDraft.partner=name;gateSeq=[];
+  document.getElementById("sexGate").style.display="none";document.getElementById("sexMain").style.display="block";
+  const fc=document.getElementById("sxFilterChips");if(fc)fc.style.display="none";
+  renderPartnerHeader(name);renderSex();window.scrollTo(0,0);}
+function lockSex(){curPartner=null;gateSeq=[];document.getElementById("sexMain").style.display="none";document.getElementById("sexGate").style.display="block";renderGate();window.scrollTo(0,0);}
+function partnerStats(name){const log=(DB.sexLog||[]).filter(e=>e.partner===name);const count=log.length;const durs=log.map(e=>e.duration).filter(x=>x>0);const avg=durs.length?Math.round(durs.reduce((a,b)=>a+b,0)/durs.length):0;let wk=0;const t0=new Date();const wkStart=new Date();wkStart.setDate(wkStart.getDate()-6);log.forEach(e=>{const d=stripT(new Date(e.date));if(d>=stripT(wkStart)&&d<=stripT(t0))wk++;});let last="—";if(log.length){const ld=log.map(e=>e.date).sort().slice(-1)[0];last=fmtDate(ld);}return{count,avg,wk,last};}
+function renderPartnerHeader(name){const wrap=document.getElementById("partnerHeaderWrap");if(!wrap)return;const c=cfgFor(name),s=partnerStats(name);
+  const hero=`<div class="phero"><div class="phero-top"><span class="phero-icon">${c.icon||"💠"}</span><span class="phero-name">${esc(name)}</span></div><div class="phero-stats"><div><b>${s.count}</b><span>مرات</span></div><div><b>${s.wk}</b><span>الأسبوع</span></div><div><b>${s.avg||"—"}</b><span>متوسط د</span></div><div><b>${s.last}</b><span>آخر مرة</span></div></div></div>`;
+  const ban=c.banner?`<img class="pbanner${c.bannerPos==="below"?" below":""}" src="${c.banner}">`:"";
+  wrap.innerHTML=c.banner&&c.bannerPos==="below"?(hero+ban):(ban+hero);
+}
+/* CONFIG (settings) */
+function renderSexCfg(){
+  const wrap=document.getElementById("sexCfgList");if(!wrap)return;wrap.innerHTML="";
+  (DB.partners||[]).forEach((name,i)=>{const c=cfgFor(name);
+    const card=document.createElement("div");card.className="poscard";
+    const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px";head.textContent=(c.icon||"💠")+" "+name;card.appendChild(head);
+    const l1=document.createElement("div");l1.className="lbl";l1.textContent="التتابع السري (اضغط الإيموجيهات بالترتيب)";card.appendChild(l1);
+    const seq=document.createElement("div");seq.className="gateseq";seq.style.fontSize="24px";seq.style.minHeight="32px";seq.textContent=c.combo.join("")||"—";card.appendChild(seq);
+    const pad=document.createElement("div");pad.className="gatepad";GATE_EMOJIS.forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.style.fontSize="20px";b.textContent=e;b.onclick=()=>{c.combo.push(e);if(c.combo.length>6)c.combo.shift();dbSave();seq.textContent=c.combo.join("");};pad.appendChild(b);});card.appendChild(pad);
+    const clr=document.createElement("button");clr.className="btn ghost sm";clr.style.marginTop="6px";clr.textContent="مسح التتابع";clr.onclick=()=>{c.combo=[];dbSave();seq.textContent="—";};card.appendChild(clr);
+    const l2=document.createElement("div");l2.className="lbl";l2.style.marginTop="11px";l2.textContent="الأيقونة (إيموجي)";card.appendChild(l2);
+    const ic=document.createElement("input");ic.value=c.icon||"";ic.maxLength=4;ic.placeholder="💠";ic.onchange=()=>{c.icon=ic.value.trim()||"💠";dbSave();head.textContent=c.icon+" "+name;renderSexCfg();};card.appendChild(ic);
+    const l3=document.createElement("div");l3.className="lbl";l3.style.marginTop="11px";l3.textContent="صورة متحركة (GIF) — اختياري";card.appendChild(l3);
+    const row=document.createElement("div");row.className="posactions";
+    const lbl=document.createElement("label");lbl.className="btn ghost sm";lbl.textContent="+ صورة";const fi=document.createElement("input");fi.type="file";fi.accept="image/*";fi.style.display="none";fi.onchange=()=>cfgBanner(name,fi);lbl.appendChild(fi);
+    const urlin=document.createElement("input");urlin.placeholder="أو لصق لينك صورة";urlin.style.flex="1";
+    const ub=document.createElement("button");ub.className="btn ghost sm";ub.textContent="حفظ اللينك";ub.onclick=()=>{const v=urlin.value.trim();if(v){c.banner=v;dbSave();renderSexCfg();}};
+    row.appendChild(lbl);row.appendChild(urlin);row.appendChild(ub);card.appendChild(row);
+    const posrow=document.createElement("div");posrow.style.cssText="display:flex;gap:8px;align-items:center;margin-top:9px;flex-wrap:wrap";
+    posrow.innerHTML=`<span class="small">مكان الصورة:</span>`;
+    ["above","below"].forEach(pp=>{const pb=document.createElement("button");pb.className="btn ghost sm";pb.style.background=c.bannerPos===pp?"var(--teal-soft)":"";pb.textContent=pp==="above"?"فوق الهيدر":"تحت الهيدر";pb.onclick=()=>{c.bannerPos=pp;dbSave();renderSexCfg();};posrow.appendChild(pb);});
+    if(c.banner){const del=document.createElement("span");del.className="small";del.style.cssText="color:var(--bad);cursor:pointer;font-weight:700";del.textContent="حذف الصورة";del.onclick=()=>{c.banner="";dbSave();renderSexCfg();};posrow.appendChild(del);
+      const prev=document.createElement("img");prev.src=c.banner;prev.style.cssText="width:60px;height:42px;object-fit:cover;border-radius:8px";posrow.appendChild(prev);}
+    card.appendChild(posrow);
+    wrap.appendChild(card);
+  });
+}
+function cfgBanner(name,input){const f=input.files&&input.files[0];if(!f)return;if(f.size>3*1024*1024){toast("الصورة كبيرة (أكبر من ٣ ميجا) — استخدم لينك أحسن");return;}const fr=new FileReader();fr.onload=()=>{cfgFor(name).banner=fr.result;dbSave();renderSexCfg();toast("اتحفظت الصورة");};fr.readAsDataURL(f);input.value="";}
+function toggleStealth(){const s=S();s.stealth=!s.stealth;dbSave();applyStealth();renderStealthToggle();}
+function renderStealthToggle(){const t=document.getElementById("stealthToggle");if(t)t.classList.toggle("on",!!S().stealth);}
+function applyStealth(){const btn=document.getElementById("navSex");if(!btn)return;if(S().stealth){btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>أدوات';}else{btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>خاص';}}
+
 /* HELPERS */
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
 function val(id,v){const e=document.getElementById(id);if(e)e.value=v;}
@@ -1878,7 +1963,7 @@ function computeStreak(){let st=0;const d=new Date();
     if(active)st++;else if(i>0)break;d.setDate(d.getDate()-1);}
   set("streak",st);}
 function go(v){document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));document.getElementById("v-"+v).classList.add("active");
-  document.querySelectorAll(".nb").forEach(b=>b.classList.toggle("active",b.dataset.v===v));if(v==="progress")drawChart();if(v==="history")renderHistory();if(v==="sex")renderSex();if(v==="settings")loadSettings();window.scrollTo(0,0);}
+  document.querySelectorAll(".nb").forEach(b=>b.classList.toggle("active",b.dataset.v===v));if(v==="progress")drawChart();if(v==="history")renderHistory();if(v==="sex"){if(curPartner)renderSex();else lockSex();}if(v==="settings")loadSettings();window.scrollTo(0,0);}
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1900);}
 
 /* BOOT */
@@ -1891,7 +1976,7 @@ function toast(m){const t=document.getElementById("toast");t.textContent=m;t.cla
     if(session){ await loadFromCloud(); hideAuth(); renderAccount(); if(bioEnabled()) showLock(); }
     else { showAuth(); }
   } else { hideAuth(); }
-  renderAll();
+  renderAll(); applyStealth();
   document.addEventListener("visibilitychange",()=>{if(document.hidden&&bioEnabled())showLock();});
   window.addEventListener("pagehide",()=>{if(bioEnabled())showLock();});
   checkReminders(); setInterval(checkReminders,30000);
