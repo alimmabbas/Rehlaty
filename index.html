@@ -86,7 +86,8 @@
   .lname{flex:1;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lval{color:var(--muted);font-weight:700;font-size:11.5px;flex-shrink:0}
   .pill{padding:12px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:13px;color:var(--muted);cursor:pointer;transition:.15s;-webkit-user-select:none;user-select:none}
-  .pill.on{background:var(--teal-soft);border-color:var(--teal);color:var(--teal)}
+  .pill.on{background:var(--teal);border-color:var(--teal);color:#fff}
+  .pill.on::before{content:"✓ "}
   .pill:active{transform:scale(.97)}
   .histday{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
   .hd-head{display:flex;align-items:center;gap:8px;padding:11px 13px;cursor:pointer}
@@ -1846,7 +1847,12 @@ function renderWeekCompare(){
   const metrics=[["السعرات",d=>d.calories?d.calories.reduce((a,c)=>a+(+c.kcal||0),0):0,false],["المشي (د)",d=>+d.walkMin||0,true],["الصلاة",d=>prayerDone(d.prayers),true]];
   box.innerHTML=metrics.map(([name,fn,up])=>{const cur=sumRange(t0,7,fn),pv=sumRange(prev,7,fn),diff=cur-pv,better=up?diff>=0:diff<=0,arrow=diff>0?"▲":(diff<0?"▼":"–"),col=diff===0?"var(--muted)":(better?"var(--good)":"var(--bad)");return `<div class="cmp-row"><span>${name}</span><span><b>${cur}</b> <small style="color:${col}">${arrow}${Math.abs(diff)}</small></span></div>`;}).join("");
 }
-function daysSinceHabit(habId){let n=0;const d=new Date();for(let i=0;i<3650;i++){const day=DB.days[isoOf(d)];if(day&&day.habits){const v=day.habits[habId];const c=Array.isArray(v)?v.length:(+v||0);if(c>0)return n;}d.setDate(d.getDate()-1);n++;}return n;}
+function daysSinceHabit(habId){
+  const startK=(S().startDate)||isoToday();
+  let n=0;const d=new Date();
+  for(let i=0;i<3650;i++){const k=isoOf(d);const day=DB.days[k];if(day&&day.habits){const v=day.habits[habId];const c=Array.isArray(v)?v.length:(+v||0);if(c>0)return n;}if(k<=startK)break;d.setDate(d.getDate()-1);n++;}
+  return n;
+}
 function renderCleanDays(){const box=document.getElementById("cleanDays");if(!box)return;const negs=(DB.habits||[]).filter(h=>h.neg);if(!negs.length){box.innerHTML="";return;}box.innerHTML='<div class="lbl">أيام نضيفة</div>'+negs.map(h=>{const n=daysSinceHabit(h.id);return `<div class="cmp-row"><span>✅ من غير ${esc(h.name)}</span><span><b>${n}</b> يوم</span></div>`;}).join("");}
 function renderBadges(){
   const box=document.getElementById("badges");if(!box)return;const b=[];const streak=streakCount();
