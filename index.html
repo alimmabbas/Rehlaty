@@ -2067,18 +2067,31 @@ function renderGateEmojiEdit(){const w=document.getElementById("gateEmojiEdit");
 function addGateEmoji(){const v=(gv("newGateEmoji")||"").trim();if(!v)return;if(!DB.gateEmojis)DB.gateEmojis=[];if(DB.gateEmojis.includes(v)){toast("موجود بالفعل");return;}if(DB.gateEmojis.length>=12){toast("كفاية كده عشان اللوحة تفضل بسيطة");return;}DB.gateEmojis.push(v);dbSave();val("newGateEmoji","");renderGateEmojiEdit();}
 let cfgRevealed=false;
 function toggleCfgReveal(){cfgRevealed=!cfgRevealed;renderSexCfg();}
-function wireStealthReveal(){const t=document.getElementById("stealthTitle");if(!t||t._wired)return;t._wired=true;let timer=null;
-  const start=()=>{timer=setTimeout(()=>{toggleCfgReveal();if(navigator&&navigator.vibrate)navigator.vibrate(30);toast(cfgRevealed?"تم إظهار الأكواد":"اتخبّت");},650);};
-  const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
-  t.addEventListener("touchstart",start,{passive:true});t.addEventListener("touchend",cancel);t.addEventListener("touchmove",cancel);
-  t.addEventListener("mousedown",start);t.addEventListener("mouseup",cancel);t.addEventListener("mouseleave",cancel);
+function wireStealthReveal(){const t=document.getElementById("stealthTitle");if(!t||t._wired)return;t._wired=true;t.style.cursor="pointer";
+  let timer=null,fired=false;
+  const start=()=>{fired=false;clearTimeout(timer);timer=setTimeout(()=>{fired=true;toggleCfgReveal();if(navigator&&navigator.vibrate){try{navigator.vibrate(35);}catch(_){}}toast(cfgRevealed?"تم إظهار الإدارة":"اتخبّت");},600);};
+  const cancel=()=>{clearTimeout(timer);};
+  t.addEventListener("touchstart",start,{passive:true});
+  t.addEventListener("touchend",e=>{cancel();if(fired){e.preventDefault();}});
+  t.addEventListener("touchmove",cancel,{passive:true});
+  t.addEventListener("mousedown",start);
+  t.addEventListener("mouseup",cancel);
+  t.addEventListener("mouseleave",cancel);
 }
 function renderSexCfg(){
   const wrap=document.getElementById("sexCfgList");if(!wrap)return;wrap.innerHTML="";
   if(!cfgRevealed){return;}
+  const addBox=document.createElement("div");addBox.style.cssText="display:flex;gap:8px;margin-bottom:12px";
+  const ai=document.createElement("input");ai.id="newPartnerName";ai.placeholder="اسم شريك جديد";ai.style.flex="1";
+  const ab=document.createElement("button");ab.className="btn navy";ab.style.cssText="width:auto;padding:10px 16px";ab.textContent="+ إضافة";ab.onclick=()=>{const v=(ai.value||"").trim();if(!v)return;if(!DB.partners)DB.partners=[];if(!DB.partners.includes(v))DB.partners.push(v);dbSave();renderSexCfg();};
+  addBox.append(ai,ab);wrap.appendChild(addBox);
+  if(!(DB.partners||[]).length){const hint=document.createElement("div");hint.className="small";hint.textContent="ضيف شريك بالاسم فوق، وبعدين حدّدله تتابع إيموجي سري وأيقونة.";wrap.appendChild(hint);}
   (DB.partners||[]).forEach((name,i)=>{const c=cfgFor(name);
     const card=document.createElement("div");card.className="poscard";
-    const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px";head.textContent=(c.icon||"💠")+" "+name;card.appendChild(head);
+    const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center";
+    const hn=document.createElement("span");hn.textContent=(c.icon||"💠")+" "+name;head.appendChild(hn);
+    const del=document.createElement("span");del.textContent="🗑️ حذف";del.style.cssText="color:var(--bad);font-size:12px;font-weight:700;cursor:pointer";del.onclick=()=>{if(!confirm("تحذف "+name+"؟ التسجيلات القديمة بتفضل."))return;DB.partners=DB.partners.filter(p=>p!==name);if(DB.partnerCfg)delete DB.partnerCfg[name];dbSave();renderSexCfg();};head.appendChild(del);
+    card.appendChild(head);
     const l1=document.createElement("div");l1.className="lbl";l1.textContent="التتابع السري (اضغط الإيموجيهات بالترتيب)";card.appendChild(l1);
     const seq=document.createElement("div");seq.className="gateseq";seq.style.fontSize="24px";seq.style.minHeight="32px";seq.textContent=c.combo.join("")||"—";card.appendChild(seq);
     const pad=document.createElement("div");pad.className="gatepad";gateEmojis().forEach(e=>{const b=document.createElement("div");b.className="gatekey";b.style.fontSize="20px";b.textContent=e;b.onclick=()=>{c.combo.push(e);if(c.combo.length>6)c.combo.shift();dbSave();seq.textContent=c.combo.join("");};pad.appendChild(b);});card.appendChild(pad);
