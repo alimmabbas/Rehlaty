@@ -37,8 +37,8 @@
   .hchip{background:rgba(255,255,255,.1);border-radius:10px;padding:5px 8px;font-size:11px;text-align:center;flex:1}
   .hchip b{display:block;font-size:15px;font-weight:800}
   main{padding:14px}
-  .view{display:none;animation:fade .22s}.view.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .view{display:none;animation:fade .2s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
   .card{background:var(--card);border-radius:17px;padding:15px;margin-bottom:13px;box-shadow:0 1px 3px rgba(0,0,30,.05)}
   .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
   .ch h3{font-size:14.5px;font-weight:800}.ch .meta{font-size:11.5px;color:var(--muted);font-weight:700}
@@ -694,7 +694,7 @@
       <div class="card">
         <div class="ch"><h3>🎯 أهدافي (تحكّم كامل)</h3></div>
         <div class="row2">
-          <div class="field"><label>الاسم (للتقرير)</label><input type="text" id="setName"></div>
+          <div class="field"><label>الاسم (للتقرير)</label><input type="text" id="setName" oninput="S().name=this.value;dbSave();renderAccount()"></div>
           <div class="field"><label>السن</label><input type="number" id="setAge"></div>
           <div class="field"><label>وزن البداية</label><input type="number" id="setStart" step="0.1"></div>
           <div class="field"><label>وزن الهدف</label><input type="number" id="setGoal" step="0.1"></div>
@@ -778,7 +778,8 @@
           <button class="btn ghost sm" onclick="addGateEmoji()">+ إضافة</button>
         </div>
         <div class="note" style="margin-top:8px">لو غيّرت الإيموجيهات، راجع التتابع السري لكل شريكة تحت إنه لسه بإيموجيهات موجودة.</div>
-        <div class="lbl" style="margin-top:14px">لكل شريكة: تتابع إيموجي سري يفتح صفحتها + أيقونة + صورة متحركة</div>
+        <div class="lbl" style="margin-top:14px">أكواد الشركاء (التتابع السري + الأيقونة + الصورة)</div>
+        <button class="btn ghost sm" id="cfgRevealBtn" style="margin:6px 0 4px" onclick="toggleCfgReveal()">👁️ إظهار الأكواد للتعديل</button>
         <div id="sexCfgList"></div>
       </div>
       <div class="card">
@@ -805,6 +806,7 @@
       </div>
     </section>
   </main>
+  </div>
   <nav>
     <button class="nb active" data-v="today" onclick="go('today')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>اليوم</button>
     <button class="nb" data-v="progress" onclick="go('progress')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M19 9l-5 5-4-4-3 3"/></svg>التقدم</button>
@@ -815,7 +817,6 @@
     <button class="nb" data-v="plan" onclick="go('plan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>الخطة</button>
     <button class="nb" data-v="settings" onclick="go('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-2.82 1.17V21a2 2 0 01-4 0v-.09A1.65 1.65 0 007 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 14a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 7.4l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6h.09A1.65 1.65 0 0011 3.09V3a2 2 0 014 0v.09a1.65 1.65 0 001.51 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0021 9.09V9a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>الإعدادات</button>
   </nav>
-</div>
 <div class="toast" id="toast"></div>
 <div id="reportOverlay">
   <div class="rtoolbar noprint">
@@ -1269,7 +1270,7 @@ function renderPlan(){
 function renderRefs(){set("kcalRef","~"+S().kcal+" يومياً");set("protRef",S().protein+" جم");}
 
 /* SETTINGS */
-function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();renderSexCfg();renderGateEmojiEdit();renderStealthToggle();}
+function loadSettings(){const s=S();val("setName",s.name||"");val("setAge",s.age||"");val("setStart",s.startW);val("setGoal",s.goalW);val("setH",s.heightCm);val("setDate",s.startDate);val("setWater",s.waterTarget);val("setWeeks",s.weeks);val("setKcal",s.kcal);val("setProt",s.protein);val("setFruitTarget",s.fruitTarget||2);renderMedManage();renderRemManage();renderHabitManage();renderPeopleManage();renderFavFruits();renderBio();cfgRevealed=false;const _rb=document.getElementById("cfgRevealBtn");if(_rb)_rb.textContent="👁️ إظهار الأكواد للتعديل";renderSexCfg();renderGateEmojiEdit();renderStealthToggle();}
 function saveSettings(){const s=S();
   s.name=gv("setName");s.age=gv("setAge");
   s.startW=+gv("setStart")||s.startW;s.goalW=+gv("setGoal")||s.goalW;s.heightCm=+gv("setH")||s.heightCm;
@@ -1928,8 +1929,11 @@ function renderPartnerHeader(name){const wrap=document.getElementById("partnerHe
 /* CONFIG (settings) */
 function renderGateEmojiEdit(){const w=document.getElementById("gateEmojiEdit");if(!w)return;w.innerHTML="";const arr=gateEmojis();const grid=document.createElement("div");grid.style.cssText="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px";arr.forEach((e,i)=>{const chip=document.createElement("div");chip.style.cssText="font-size:24px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:6px";chip.innerHTML=`<span>${e}</span>`;const x=document.createElement("span");x.textContent="✕";x.style.cssText="font-size:13px;color:var(--bad);cursor:pointer";x.onclick=()=>{if(DB.gateEmojis.length<=2){toast("لازم يفضل على الأقل ٢ إيموجي");return;}DB.gateEmojis.splice(i,1);dbSave();renderGateEmojiEdit();};chip.appendChild(x);grid.appendChild(chip);});w.appendChild(grid);}
 function addGateEmoji(){const v=(gv("newGateEmoji")||"").trim();if(!v)return;if(!DB.gateEmojis)DB.gateEmojis=[];if(DB.gateEmojis.includes(v)){toast("موجود بالفعل");return;}if(DB.gateEmojis.length>=12){toast("كفاية كده عشان اللوحة تفضل بسيطة");return;}DB.gateEmojis.push(v);dbSave();val("newGateEmoji","");renderGateEmojiEdit();}
+let cfgRevealed=false;
+function toggleCfgReveal(){cfgRevealed=!cfgRevealed;const b=document.getElementById("cfgRevealBtn");if(b)b.textContent=cfgRevealed?"🙈 إخفاء الأكواد":"👁️ إظهار الأكواد للتعديل";renderSexCfg();}
 function renderSexCfg(){
   const wrap=document.getElementById("sexCfgList");if(!wrap)return;wrap.innerHTML="";
+  if(!cfgRevealed){wrap.innerHTML='<div class="small">🔒 الأكواد مخفية للحماية. اضغط «إظهار» علشان تشوفها أو تعدّلها. بتترجع متخفية أول ما تقفل الإعدادات.</div>';return;}
   (DB.partners||[]).forEach((name,i)=>{const c=cfgFor(name);
     const card=document.createElement("div");card.className="poscard";
     const head=document.createElement("div");head.style.cssText="font-weight:800;margin-bottom:8px";head.textContent=(c.icon||"💠")+" "+name;card.appendChild(head);
